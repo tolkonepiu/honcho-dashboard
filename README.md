@@ -13,7 +13,7 @@ instance: workspaces, peers, sessions, messages, and conclusions.
 > This is a third-party dashboard for Honcho, not the official `app.honcho.dev`
 > UI.
 
-## Getting started
+## Quick start
 
 Install dependencies:
 
