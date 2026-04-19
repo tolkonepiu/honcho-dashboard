@@ -21,6 +21,12 @@ Install dependencies:
 npm install
 ```
 
+Build the app first:
+
+```bash
+npm run build
+```
+
 Set the environment variables before starting the app:
 
 - `HONCHO_BASE_URL` — required, the base URL of your Honcho instance
@@ -30,13 +36,13 @@ Set the environment variables before starting the app:
 Example:
 
 ```bash
-HONCHO_BASE_URL=http://your-honcho-instance-url npm run dev
+HONCHO_BASE_URL=http://your-honcho-instance-url npm run start
 ```
 
 If your instance requires authentication:
 
 ```bash
-HONCHO_BASE_URL=http://your-honcho-instance-url HONCHO_API_KEY=your-api-key npm run dev
+HONCHO_BASE_URL=http://your-honcho-instance-url HONCHO_API_KEY=your-api-key npm run start
 ```
 
 Then open [http://localhost:3000](http://localhost:3000).
