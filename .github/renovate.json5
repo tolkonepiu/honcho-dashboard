@@ -22,8 +22,7 @@
     {
       matchManagers: [
         'bun',
-        'dockerfile',
-        'npm'
+        'dockerfile'
       ],
       bumpVersion: 'patch',
     },
