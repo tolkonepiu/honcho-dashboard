@@ -1,6 +1,6 @@
 {
   "name": "honcho-dashboard",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,22 +9,22 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@honcho-ai/sdk": "^2.1.1",
-    "date-fns": "^4.1.0",
+    "@honcho-ai/sdk": "2.1.1",
+    "date-fns": "4.1.0",
     "next": "16.2.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "server-only": "^0.0.1"
+    "server-only": "0.0.1"
   },
   "devDependencies": {
-    "@catppuccin/tailwindcss": "^1.0.0",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@catppuccin/tailwindcss": "1.0.0",
+    "@tailwindcss/postcss": "4.2.2",
+    "@types/node": "20.19.39",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^9",
+    "eslint": "9.39.4",
     "eslint-config-next": "16.2.4",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "tailwindcss": "4.2.2",
+    "typescript": "5.9.3"
   }
 }
