@@ -21,7 +21,9 @@
   packageRules: [
     {
       matchManagers: [
-        'npm',
+        'bun',
+        'dockerfile',
+        'npm'
       ],
       bumpVersion: 'patch',
     },
