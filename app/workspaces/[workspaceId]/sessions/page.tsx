@@ -56,7 +56,7 @@ export default async function SessionsPage({ params }: Props) {
       <SessionsSection
         workspaceId={workspaceId}
         initialSessions={initialSessions}
-        showMetadataColumn
+        showMetadataColumns
       />
     </div>
   );
