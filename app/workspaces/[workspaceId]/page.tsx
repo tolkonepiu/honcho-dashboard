@@ -190,14 +190,6 @@ export default async function WorkspaceDetailPage({
       </dl>
 
       <div className="grid gap-6 xl:grid-cols-3">
-        <div id="workspace-primary-column" className="space-y-6 xl:col-span-1">
-          <PeersSection workspaceId={workspaceId} initialPeers={initialPeers} />
-          <SessionsSection
-            workspaceId={workspaceId}
-            initialSessions={initialSessions}
-          />
-        </div>
-
         <div className="min-h-0 xl:col-span-2">
           <ConclusionsPanel
             workspaceId={workspaceId}
@@ -211,6 +203,14 @@ export default async function WorkspaceDetailPage({
               sessionId,
             }}
             initialConclusions={initialConclusions}
+          />
+        </div>
+
+        <div id="workspace-primary-column" className="space-y-6 xl:col-span-1">
+          <PeersSection workspaceId={workspaceId} initialPeers={initialPeers} />
+          <SessionsSection
+            workspaceId={workspaceId}
+            initialSessions={initialSessions}
           />
         </div>
       </div>
