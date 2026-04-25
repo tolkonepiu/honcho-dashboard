@@ -701,3 +701,20 @@ export async function getWorkspaceStats(
     conclusionCount: conclusionsPage.total,
   };
 }
+
+export async function deleteWorkspace(workspaceId: string): Promise<void> {
+  const client = createClient();
+  await runHonchoRequest(() =>
+    client.http.delete(workspacePath(workspaceId)),
+  );
+}
+
+export async function deleteSession(
+  workspaceId: string,
+  sessionId: string,
+): Promise<void> {
+  const client = createClient(workspaceId);
+  await runHonchoRequest(() =>
+    client.http.delete(sessionPath(workspaceId, sessionId)),
+  );
+}
