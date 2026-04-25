@@ -15,6 +15,7 @@ type SessionRow = {
   isActive: boolean;
   createdAt: string;
   metadata: Record<string, unknown>;
+  configuration: Record<string, unknown>;
 };
 
 type PaginatedSessionsData = {
@@ -33,7 +34,7 @@ type SessionsSectionProps = {
   title?: string;
   emptyStateTitle?: string;
   emptyStateDescription?: string;
-  showMetadataColumn?: boolean;
+  showMetadataColumns?: boolean;
 };
 
 export function SessionsSection({
@@ -44,7 +45,7 @@ export function SessionsSection({
   title,
   emptyStateTitle,
   emptyStateDescription,
-  showMetadataColumn,
+  showMetadataColumns,
 }: SessionsSectionProps) {
   const [query, setQuery] = useState({ page: initialSessions.page });
   const [sessions, setSessions] = useState(initialSessions);
@@ -97,23 +98,28 @@ export function SessionsSection({
       emptyDescription={resolvedEmptyStateDescription}
       error={error}
     >
-      <div className="overflow-hidden">
-        <table className="w-full table-fixed text-left text-sm">
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-left text-sm">
           <thead className="bg-ctp-crust/90 text-xs uppercase tracking-wide text-ctp-subtext0">
             <tr>
-              <th scope="col" className="w-[50%] px-3 py-3 font-medium sm:px-4">
+              <th scope="col" className="px-4 py-3 font-medium sm:px-6">
                 Session ID
               </th>
-              <th scope="col" className="w-[25%] px-3 py-3 font-medium sm:px-4">
+              <th scope="col" className="px-4 py-3 font-medium sm:px-6">
                 Status
               </th>
-              <th scope="col" className="w-[25%] px-3 py-3 font-medium sm:px-4">
+              <th scope="col" className="px-4 py-3 font-medium sm:px-6">
                 Created At
               </th>
-              {showMetadataColumn ? (
-                <th scope="col" className="px-3 py-3 font-medium sm:px-4">
-                  Metadata
-                </th>
+              {showMetadataColumns ? (
+                <>
+                  <th scope="col" className="px-4 py-3 font-medium sm:px-6">
+                    Metadata
+                  </th>
+                  <th scope="col" className="px-4 py-3 font-medium sm:px-6">
+                    Configuration
+                  </th>
+                </>
               ) : null}
             </tr>
           </thead>
@@ -128,16 +134,16 @@ export function SessionsSection({
                   key={session.id}
                   className="group"
                 >
-                  <td className="px-3 py-3 font-medium text-ctp-text sm:px-4">
+                  <td className="px-4 py-3 font-medium text-ctp-text sm:px-6">
                     <Link
                       href={href}
                       title={session.id}
-                      className="block truncate rounded-sm underline-offset-2 transition-colors group-hover:text-ctp-lavender hover:underline"
+                      className="block whitespace-normal break-words truncate rounded-sm underline-offset-2 transition-colors group-hover:text-ctp-lavender hover:underline"
                     >
                       {session.id}
                     </Link>
                   </td>
-                  <td className="px-3 py-3 sm:px-4">
+                  <td className="px-4 py-3 sm:px-6">
                     <span
                       className={`inline-flex whitespace-nowrap rounded-full border px-2 py-0.5 text-xs font-medium ${
                         session.isActive
@@ -148,13 +154,18 @@ export function SessionsSection({
                       {session.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
-                  <td className="px-3 py-3 text-xs leading-5 text-ctp-subtext0 sm:px-4 sm:text-sm">
+                  <td className="px-4 py-3 text-xs leading-5 text-ctp-subtext0 sm:px-6 sm:text-sm">
                     <RelativeTime value={session.createdAt} />
                   </td>
-                  {showMetadataColumn ? (
-                    <td className="px-3 py-3 align-top sm:px-4">
-                      <JsonCell value={session.metadata} />
-                    </td>
+                  {showMetadataColumns ? (
+                    <>
+                      <td className="px-4 py-3 align-top sm:px-6">
+                        <JsonCell value={session.metadata} />
+                      </td>
+                      <td className="px-4 py-3 align-top sm:px-6">
+                        <JsonCell value={session.configuration} />
+                      </td>
+                    </>
                   ) : null}
                 </ClickableTableRow>
               );
