@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import { getApiErrorMessage } from "@/lib/api-client";
+import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
 
 type UsePaginatedFetchOptions<TData> = {
   entityName: string;
@@ -100,6 +101,8 @@ export function usePaginatedFetch<TData>({
 
     setRefreshNonce((previous) => previous + 1);
   }, [isPending]);
+
+  usePageRefreshSignal(refresh);
 
   return {
     isPending,

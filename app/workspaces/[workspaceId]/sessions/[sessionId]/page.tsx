@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { HonchoErrorState } from "@/components/ui/honcho-error-state";
+import { PageHeaderActions } from "@/components/ui/page-header-actions";
 import { RelativeTime } from "@/components/ui/relative-time";
 import {
   type DashboardPeer,
@@ -64,7 +65,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function SessionDetailPage({ params }: Props) {
   const { workspaceId, sessionId } = await params;
-  const wsBase = `/workspaces/${encodeURIComponent(workspaceId)}`;
+  const encodedWorkspaceId = encodeURIComponent(workspaceId);
+  const encodedSessionId = encodeURIComponent(sessionId);
+  const wsBase = `/workspaces/${encodedWorkspaceId}`;
 
   let session: DashboardSession | null;
   try {
@@ -102,13 +105,25 @@ export default async function SessionDetailPage({ params }: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight text-ctp-text">
-          {session.id}
-        </h1>
-        <p className="text-sm text-ctp-subtext0">
-          Created <RelativeTime value={session.createdAt} />
-        </p>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 space-y-1">
+          <h1 className="text-2xl font-semibold tracking-tight text-ctp-text">
+            {session.id}
+          </h1>
+          <p className="text-sm text-ctp-subtext0">
+            Created <RelativeTime value={session.createdAt} />
+          </p>
+        </div>
+
+        <PageHeaderActions
+          refreshLabel="Refresh session"
+          deleteAction={{
+            entityId: session.id,
+            entityLabel: "Session",
+            apiPath: `/api/workspaces/${encodedWorkspaceId}/sessions/${encodedSessionId}`,
+            redirectTo: `${wsBase}/sessions`,
+          }}
+        />
       </div>
 
       <dl className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

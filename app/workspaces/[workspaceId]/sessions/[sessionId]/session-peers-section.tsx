@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ClickableTableRow } from "@/components/ui/clickable-table-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { RelativeTime } from "@/components/ui/relative-time";
 import { TablePager, TableRefreshButton } from "@/components/ui/table-controls";
+import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
 import { getApiErrorMessage } from "@/lib/api-client";
 
 type SessionPeer = {
@@ -40,7 +41,7 @@ export function SessionPeersSection({
     return peers.slice(start, start + pageSize);
   }, [page, peers]);
 
-  const refreshPeers = async () => {
+  const refreshPeers = useCallback(async () => {
     if (isPending) {
       return;
     }
@@ -81,7 +82,11 @@ export function SessionPeersSection({
     } finally {
       setIsPending(false);
     }
-  };
+  }, [isPending, sessionId, workspaceId]);
+
+  usePageRefreshSignal(() => {
+    void refreshPeers();
+  });
 
   const peersBasePath = `/workspaces/${encodeURIComponent(workspaceId)}/peers`;
 

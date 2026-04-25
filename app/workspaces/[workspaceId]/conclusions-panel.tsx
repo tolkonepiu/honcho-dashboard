@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { metadataButtonClass } from "@/components/ui/button-styles";
 import { CopyIdButton } from "@/components/ui/copy-id-button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { RelativeTime } from "@/components/ui/relative-time";
 import { TablePager, TableRefreshButton } from "@/components/ui/table-controls";
 import { useClipboard } from "@/hooks/use-clipboard";
+import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
 import { usePagination } from "@/hooks/use-pagination";
 import { getApiErrorMessage } from "@/lib/api-client";
 import { ConclusionsControls, type QueryUpdates } from "./conclusions-controls";
@@ -284,13 +285,15 @@ export function ConclusionsPanel({
     }
   };
 
-  const refreshConclusions = () => {
+  const refreshConclusions = useCallback(() => {
     if (isPending) {
       return;
     }
 
     setRefreshNonce((previous) => previous + 1);
-  };
+  }, [isPending]);
+
+  usePageRefreshSignal(refreshConclusions);
 
   const filterByObserver = (observerId: string) => {
     updateQuery({ observer_id: observerId }, true);

@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CopyIdButton } from "@/components/ui/copy-id-button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { RelativeTime } from "@/components/ui/relative-time";
 import { SelectField } from "@/components/ui/select-field";
 import { TablePager, TableRefreshButton } from "@/components/ui/table-controls";
 import { useClipboard } from "@/hooks/use-clipboard";
+import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
 import { usePagination } from "@/hooks/use-pagination";
 import { getApiErrorMessage } from "@/lib/api-client";
 
@@ -275,13 +276,15 @@ export function MessagesSection({
     };
   }, [pageSize, query, refreshNonce, sessionId, workspaceId]);
 
-  const refreshMessages = () => {
+  const refreshMessages = useCallback(() => {
     if (isPending) {
       return;
     }
 
     setRefreshNonce((previous) => previous + 1);
-  };
+  }, [isPending]);
+
+  usePageRefreshSignal(refreshMessages);
 
   const copyMessageId = async (id: string) => {
     const didCopy = await copyToClipboard(id);

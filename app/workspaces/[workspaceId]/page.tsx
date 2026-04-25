@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HonchoErrorState } from "@/components/ui/honcho-error-state";
+import { PageHeaderActions } from "@/components/ui/page-header-actions";
 import { RelativeTime } from "@/components/ui/relative-time";
 import { parsePositiveInteger } from "@/lib/api-utils";
 import {
@@ -126,7 +127,8 @@ export default async function WorkspaceDetailPage({
     ...(sessionId ? { session_id: sessionId } : {}),
   };
 
-  const base = `/workspaces/${encodeURIComponent(workspaceId)}`;
+  const encodedWorkspaceId = encodeURIComponent(workspaceId);
+  const base = `/workspaces/${encodedWorkspaceId}`;
 
   let stats: WorkspaceStats;
   let peers: DashboardPeer[];
@@ -166,13 +168,25 @@ export default async function WorkspaceDetailPage({
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight text-ctp-text">
-          {workspaceId}
-        </h1>
-        <p className="text-sm text-ctp-subtext0">
-          Created <RelativeTime value={workspace.createdAt} />
-        </p>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 space-y-1">
+          <h1 className="text-2xl font-semibold tracking-tight text-ctp-text">
+            {workspaceId}
+          </h1>
+          <p className="text-sm text-ctp-subtext0">
+            Created <RelativeTime value={workspace.createdAt} />
+          </p>
+        </div>
+
+        <PageHeaderActions
+          refreshLabel="Refresh workspace"
+          deleteAction={{
+            entityId: workspaceId,
+            entityLabel: "Workspace",
+            apiPath: `/api/workspaces/${encodedWorkspaceId}`,
+            redirectTo: "/workspaces",
+          }}
+        />
       </div>
 
       <dl className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

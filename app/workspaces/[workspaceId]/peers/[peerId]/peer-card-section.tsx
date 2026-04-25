@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { TableRefreshButton } from "@/components/ui/table-controls";
 import { EmptyState } from "@/components/ui/empty-state";
+import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
 import { getApiErrorMessage } from "@/lib/api-client";
 
 type PeerCardSectionProps = {
@@ -34,7 +35,7 @@ export function PeerCardSection({
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const refreshCard = async () => {
+  const refreshCard = useCallback(async () => {
     if (isPending) {
       return;
     }
@@ -70,7 +71,11 @@ export function PeerCardSection({
     } finally {
       setIsPending(false);
     }
-  };
+  }, [isPending, peerId, workspaceId]);
+
+  usePageRefreshSignal(() => {
+    void refreshCard();
+  });
 
   const cardItems = buildPeerCardItems(card);
 
