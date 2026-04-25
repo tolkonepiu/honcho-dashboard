@@ -101,13 +101,13 @@ export function SessionsSection({
         <table className="w-full table-fixed text-left text-sm">
           <thead className="bg-ctp-crust/90 text-xs uppercase tracking-wide text-ctp-subtext0">
             <tr>
-              <th scope="col" className="w-[48%] px-3 py-3 font-medium sm:px-4">
+              <th scope="col" className="w-[50%] px-3 py-3 font-medium sm:px-4">
                 Session ID
               </th>
-              <th scope="col" className="w-[22%] px-3 py-3 font-medium sm:px-4">
+              <th scope="col" className="w-[25%] px-3 py-3 font-medium sm:px-4">
                 Status
               </th>
-              <th scope="col" className="w-[30%] px-3 py-3 font-medium sm:px-4">
+              <th scope="col" className="w-[25%] px-3 py-3 font-medium sm:px-4">
                 Created At
               </th>
               {showMetadataColumn ? (
