@@ -95,56 +95,58 @@ function MessageListItem({
   return (
     <li className={`flex ${isRight ? "justify-end" : "justify-start"}`}>
       <article className="w-full max-w-4xl">
-        <div className={`flex min-w-0 flex-1 flex-col space-y-2 ${isRight ? "items-end" : "items-start"}`}>
-            <div
-              className={`flex w-full flex-wrap items-center gap-x-2 gap-y-1 ${isRight ? "justify-end" : "justify-start"}`}
+        <div
+          className={`flex min-w-0 flex-1 flex-col space-y-2 ${isRight ? "items-end" : "items-start"}`}
+        >
+          <div
+            className={`flex w-full flex-wrap items-center gap-x-2 gap-y-1 ${isRight ? "justify-end" : "justify-start"}`}
+          >
+            <button
+              type="button"
+              onClick={() => {
+                onFilterPeer(message.peerId);
+              }}
+              className="inline-flex items-center px-0 py-0 text-left text-[11px] font-semibold uppercase tracking-[0.05em] text-ctp-subtext0 transition-colors hover:text-ctp-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle"
             >
-              <button
-                type="button"
-                onClick={() => {
-                  onFilterPeer(message.peerId);
-                }}
-                className="inline-flex items-center px-0 py-0 text-left text-[11px] font-semibold uppercase tracking-[0.05em] text-ctp-subtext0 transition-colors hover:text-ctp-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle"
-              >
-                {message.peerId}
-              </button>
+              {message.peerId}
+            </button>
 
-              <RelativeTime
-                value={message.createdAt}
-                className="text-xs text-ctp-subtext0"
-              />
-            </div>
+            <RelativeTime
+              value={message.createdAt}
+              className="text-xs text-ctp-subtext0"
+            />
+          </div>
 
-            <div
-              className={`w-full max-w-3xl border-2 px-4 py-3 shadow-[var(--pixel-shadow-sm)] ${
-                isRight
-                  ? "border-ctp-surface1 bg-ctp-surface0"
-                  : "border-[var(--pixel-border)] bg-ctp-crust"
-              }`}
-            >
-              <p className="break-words whitespace-pre-wrap text-sm leading-6 text-ctp-text">
-                {message.content || "—"}
-              </p>
-            </div>
+          <div
+            className={`w-full max-w-3xl border-2 px-4 py-3 shadow-[var(--pixel-shadow-sm)] ${
+              isRight
+                ? "border-ctp-surface1 bg-ctp-surface0"
+                : "border-[var(--pixel-border)] bg-ctp-crust"
+            }`}
+          >
+            <p className="break-words whitespace-pre-wrap text-sm leading-6 text-ctp-text">
+              {message.content || "—"}
+            </p>
+          </div>
 
-            <div
-              className={`flex w-full max-w-3xl flex-wrap items-center gap-2 text-[11px] text-ctp-subtext0 ${
-                isRight ? "justify-end" : "justify-start"
-              }`}
-            >
-              <CopyIdButton
-                id={message.id}
-                copiedId={copiedId}
-                onCopy={onCopyId}
-              />
+          <div
+            className={`flex w-full max-w-3xl flex-wrap items-center gap-2 text-[11px] text-ctp-subtext0 ${
+              isRight ? "justify-end" : "justify-start"
+            }`}
+          >
+            <CopyIdButton
+              id={message.id}
+              copiedId={copiedId}
+              onCopy={onCopyId}
+            />
 
-              <span className="inline-flex items-center gap-1 border border-[var(--pixel-border)] bg-ctp-base px-2 py-1 shadow-[var(--pixel-shadow-sm)]">
-                <span className="font-medium text-ctp-subtext1">Tokens</span>
-                <span className="font-mono text-ctp-subtext0">
-                  {message.tokenCount}
-                </span>
+            <span className="inline-flex items-center gap-1 border border-[var(--pixel-border)] bg-ctp-base px-2 py-1 shadow-[var(--pixel-shadow-sm)]">
+              <span className="font-medium text-ctp-subtext1">Tokens</span>
+              <span className="font-mono text-ctp-subtext0">
+                {message.tokenCount}
               </span>
-            </div>
+            </span>
+          </div>
         </div>
       </article>
     </li>

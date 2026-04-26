@@ -10,8 +10,6 @@ import {
   type DashboardPeer,
   type DashboardSession,
   type DashboardWorkspace,
-  type PaginatedResult,
-  type WorkspaceStats,
   getWorkspace,
   getWorkspaceStats,
   listConclusions,
@@ -19,6 +17,8 @@ import {
   listPeersPaginated,
   listSessions,
   listSessionsPaginated,
+  type PaginatedResult,
+  type WorkspaceStats,
 } from "@/lib/honcho";
 import { isHonchoAppError } from "@/lib/honcho-errors";
 import { ConclusionsPanel } from "./conclusions-panel";
@@ -53,6 +53,11 @@ type StatCardProps = {
   href?: string;
 };
 
+type JsonPanelProps = {
+  title: string;
+  value: Record<string, unknown>;
+};
+
 function StatCard({ label, value, href }: StatCardProps) {
   const content = (
     <>
@@ -80,6 +85,26 @@ function StatCard({ label, value, href }: StatCardProps) {
   }
 
   return <div className={classes}>{content}</div>;
+}
+
+function JsonPanel({ title, value }: JsonPanelProps) {
+  if (Object.keys(value).length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="space-y-3">
+      <h2 className="text-xs font-semibold uppercase tracking-[0.06em] text-ctp-subtext0">
+        {title}
+      </h2>
+
+      <div className="overflow-hidden border-2 border-[var(--pixel-border)] bg-ctp-mantle shadow-[var(--pixel-shadow-md)]">
+        <pre className="overflow-x-auto whitespace-pre-wrap break-words p-4 font-mono text-xs leading-5 text-ctp-subtext1 sm:px-6">
+          {JSON.stringify(value, null, 2)}
+        </pre>
+      </div>
+    </section>
+  );
 }
 
 export default async function WorkspaceDetailPage({
@@ -203,8 +228,8 @@ export default async function WorkspaceDetailPage({
         <StatCard label="Conclusions" value={stats.conclusionCount} />
       </dl>
 
-      <div className="grid gap-6 xl:grid-cols-3">
-        <div className="min-h-0 xl:col-span-2">
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="min-h-0 lg:col-span-2">
           <ConclusionsPanel
             workspaceId={workspaceId}
             peerIds={peers.map((peer) => peer.id)}
@@ -220,12 +245,14 @@ export default async function WorkspaceDetailPage({
           />
         </div>
 
-        <div id="workspace-primary-column" className="space-y-6 xl:col-span-1">
+        <div id="workspace-primary-column" className="space-y-6 lg:col-span-1">
           <PeersSection workspaceId={workspaceId} initialPeers={initialPeers} />
           <SessionsSection
             workspaceId={workspaceId}
             initialSessions={initialSessions}
           />
+          <JsonPanel title="Metadata" value={workspace.metadata} />
+          <JsonPanel title="Configuration" value={workspace.configuration} />
         </div>
       </div>
     </div>

@@ -105,7 +105,10 @@ export function TypedConfirmationDialog({
             >
               {title}
             </h2>
-            <p id={descriptionId} className="text-xs leading-5 text-ctp-subtext0">
+            <p
+              id={descriptionId}
+              className="text-xs leading-5 text-ctp-subtext0"
+            >
               {description}
             </p>
           </div>

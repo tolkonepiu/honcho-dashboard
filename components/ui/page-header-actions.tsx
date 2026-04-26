@@ -92,7 +92,8 @@ export function PageHeaderActions({
     }
   };
 
-  const isDeleteDisabled = !deleteAction || confirmValue !== deleteAction.entityId;
+  const isDeleteDisabled =
+    !deleteAction || confirmValue !== deleteAction.entityId;
 
   return (
     <>

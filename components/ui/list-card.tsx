@@ -63,7 +63,12 @@ export function ListCardDescription({
   className,
 }: ListCardSectionProps) {
   return (
-    <p className={buildClassName("text-xs leading-5 text-ctp-subtext0", className)}>
+    <p
+      className={buildClassName(
+        "text-xs leading-5 text-ctp-subtext0",
+        className,
+      )}
+    >
       {children}
     </p>
   );
