@@ -52,7 +52,7 @@ export default async function SessionsPage({ params }: Props) {
       <SessionsSection
         workspaceId={workspaceId}
         initialSessions={initialSessions}
-        titleClassName="text-2xl font-semibold tracking-tight text-ctp-text"
+        titleClassName="text-2xl font-semibold tracking-tight text-[var(--text-primary)]"
         showMetadataColumns
       />
     </div>

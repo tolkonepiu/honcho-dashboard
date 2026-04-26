@@ -1,10 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import { CopyIdButton } from "@/components/ui/copy-id-button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { RelativeTime } from "@/components/ui/relative-time";
 import { SelectField } from "@/components/ui/select-field";
+import { Surface } from "@/components/ui/surface";
 import { TablePager, TableRefreshButton } from "@/components/ui/table-controls";
 import { useClipboard } from "@/hooks/use-clipboard";
 import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
@@ -106,31 +108,28 @@ function MessageListItem({
               onClick={() => {
                 onFilterPeer(message.peerId);
               }}
-              className="inline-flex items-center px-0 py-0 text-left text-[11px] font-semibold uppercase tracking-[0.05em] text-ctp-subtext0 transition-colors hover:text-ctp-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle"
+              className="ui-compact-label ui-compact-text inline-flex items-center px-0 py-0 text-left text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_srgb,var(--color-accent)_70%,transparent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--surface-elevated)]"
             >
               {message.peerId}
             </button>
 
             <RelativeTime
               value={message.createdAt}
-              className="text-xs text-ctp-subtext0"
+              className="text-xs text-[var(--text-muted)]"
             />
           </div>
 
-          <div
-            className={`w-full max-w-3xl border-2 px-4 py-3 shadow-[var(--pixel-shadow-sm)] ${
-              isRight
-                ? "border-ctp-surface1 bg-ctp-surface0"
-                : "border-[var(--pixel-border)] bg-ctp-crust"
-            }`}
+          <Surface
+            variant={isRight ? "inset" : "subtle"}
+            className="w-full max-w-3xl px-4 py-3"
           >
-            <p className="break-words whitespace-pre-wrap text-sm leading-6 text-ctp-text">
+            <p className="break-words whitespace-pre-wrap text-sm leading-6 text-[var(--text-primary)]">
               {message.content || "—"}
             </p>
-          </div>
+          </Surface>
 
           <div
-            className={`flex w-full max-w-3xl flex-wrap items-center gap-2 text-[11px] text-ctp-subtext0 ${
+            className={`ui-compact-text flex w-full max-w-3xl flex-wrap items-center gap-2 text-[var(--text-muted)] ${
               isRight ? "justify-end" : "justify-start"
             }`}
           >
@@ -140,12 +139,12 @@ function MessageListItem({
               onCopy={onCopyId}
             />
 
-            <span className="inline-flex items-center gap-1 border border-[var(--pixel-border)] bg-ctp-base px-2 py-1 shadow-[var(--pixel-shadow-sm)]">
-              <span className="font-medium text-ctp-subtext1">Tokens</span>
-              <span className="font-mono text-ctp-subtext0">
+            <Badge>
+              <span className="ui-compact-kicker font-medium">Tokens</span>
+              <span className="font-mono text-[var(--text-muted)]">
                 {message.tokenCount}
               </span>
-            </span>
+            </Badge>
           </div>
         </div>
       </article>
@@ -288,7 +287,7 @@ export function MessagesSection({
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.06em] text-ctp-subtext0">
+        <h2 className="ui-section-label">
           Messages ({messages.total})
         </h2>
 
@@ -299,7 +298,7 @@ export function MessagesSection({
         />
       </div>
 
-      <div className="overflow-hidden border-2 border-[var(--pixel-border)] bg-ctp-mantle shadow-[var(--pixel-shadow-md)]">
+      <Surface className="overflow-hidden">
         <div className="space-y-3 border-b-2 border-[var(--pixel-border)] p-4 sm:px-6">
           <div aria-busy={isPending} className="grid gap-3 sm:grid-cols-2">
             <SelectField
@@ -378,9 +377,9 @@ export function MessagesSection({
           onNext={pagination.onNext}
           onLast={pagination.onLast}
         />
-      </div>
+      </Surface>
 
-      {error ? <p className="text-xs text-ctp-red">{error}</p> : null}
+      {error ? <p className="text-xs text-[var(--color-danger)]">{error}</p> : null}
     </section>
   );
 }

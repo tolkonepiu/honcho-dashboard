@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import { metadataButtonClass } from "@/components/ui/button-styles";
 
 type CopyIdButtonProps = {
@@ -12,9 +13,9 @@ export function CopyFeedback({ isCopied }: { isCopied: boolean }) {
   }
 
   return (
-    <span className="inline-flex items-center border border-ctp-green bg-ctp-green/20 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-ctp-green shadow-[var(--pixel-shadow-sm)]">
+    <Badge variant="success" className="ui-compact-label ui-compact-text">
       Copied
-    </span>
+    </Badge>
   );
 }
 
@@ -28,10 +29,10 @@ export function CopyIdButton({ id, copiedId, onCopy }: CopyIdButtonProps) {
         }}
         className={metadataButtonClass}
       >
-        <span className="font-semibold uppercase tracking-[0.1em] text-ctp-subtext1">
+        <span className="ui-compact-kicker">
           ID
         </span>
-        <span className="font-mono text-ctp-subtext0">{id}</span>
+        <span className="font-mono text-[var(--text-muted)]">{id}</span>
       </button>
 
       <CopyFeedback isCopied={copiedId === id} />

@@ -1,10 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import { metadataButtonClass } from "@/components/ui/button-styles";
 import { CopyIdButton } from "@/components/ui/copy-id-button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { RelativeTime } from "@/components/ui/relative-time";
+import { Surface } from "@/components/ui/surface";
 import { TablePager, TableRefreshButton } from "@/components/ui/table-controls";
 import { useClipboard } from "@/hooks/use-clipboard";
 import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
@@ -65,7 +67,7 @@ function buildConclusionsApiUrl(
 }
 
 const deleteConclusionButtonClass =
-  "ml-auto inline-flex h-6 w-6 items-center justify-center text-ctp-red/60 transition-colors hover:text-ctp-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-red focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle disabled:cursor-not-allowed disabled:text-ctp-overlay0";
+  "ml-auto inline-flex h-6 w-6 items-center justify-center text-[color:color-mix(in_srgb,var(--color-danger)_60%,transparent)] transition-colors hover:text-[var(--color-danger)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-danger)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--surface-elevated)] disabled:cursor-not-allowed disabled:text-[var(--text-dim)]";
 
 type ConclusionListItemProps = {
   conclusion: ConclusionItem;
@@ -86,12 +88,12 @@ function ConclusionListItem({
   onDelete,
   onFilterObserver,
   onFilterObserved,
-  onFilterSession,
-}: ConclusionListItemProps) {
+    onFilterSession,
+  }: ConclusionListItemProps) {
   return (
-    <li className="border-2 border-[var(--pixel-border)] bg-ctp-crust p-4 shadow-[var(--pixel-shadow-md)] transition-colors">
+    <Surface as="li" variant="subtle" className="p-4 transition-colors">
       <div className="flex flex-wrap items-start justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-ctp-subtext0">
+        <div className="ui-compact-text flex flex-wrap items-center gap-1.5 text-[var(--text-muted)]">
           <button
             type="button"
             onClick={() => {
@@ -99,7 +101,7 @@ function ConclusionListItem({
             }}
             className={metadataButtonClass}
           >
-            <span className="font-semibold uppercase tracking-[0.1em] text-ctp-subtext1">
+            <span className="ui-compact-kicker">
               Observer
             </span>
             <span className="font-mono">{conclusion.observerId}</span>
@@ -112,7 +114,7 @@ function ConclusionListItem({
             }}
             className={metadataButtonClass}
           >
-            <span className="font-semibold uppercase tracking-[0.1em] text-ctp-subtext1">
+            <span className="ui-compact-kicker">
               Observed
             </span>
             <span className="font-mono">{conclusion.observedId}</span>
@@ -131,34 +133,34 @@ function ConclusionListItem({
               }}
               className={metadataButtonClass}
             >
-              <span className="font-semibold uppercase tracking-[0.1em] text-ctp-subtext1">
+              <span className="ui-compact-kicker">
                 Session
               </span>
               <span className="font-mono">{conclusion.sessionId}</span>
             </button>
           ) : (
-            <span className="inline-flex items-center gap-1 border border-[var(--pixel-border)] bg-ctp-base px-2 py-1 shadow-[var(--pixel-shadow-sm)]">
-              <span className="font-semibold uppercase tracking-[0.1em] text-ctp-subtext1">
+            <Badge>
+              <span className="ui-compact-kicker">
                 Session
               </span>
               <span className="font-mono">—</span>
-            </span>
+            </Badge>
           )}
         </div>
 
         <RelativeTime
           value={conclusion.createdAt}
-          className="text-[11px] text-ctp-subtext0"
+          className="ui-compact-text text-[var(--text-muted)]"
         />
       </div>
 
-      <div className="mt-3 min-w-0 max-w-full overflow-hidden border-2 border-[var(--pixel-border)] bg-ctp-base px-3 py-2.5 shadow-[var(--pixel-shadow-sm)]">
-        <p className="min-w-0 max-w-full whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-sm leading-6 text-ctp-text">
+      <Surface variant="inset" className="mt-3 min-w-0 max-w-full overflow-hidden px-3 py-2.5">
+        <p className="min-w-0 max-w-full whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-sm leading-6 text-[var(--text-primary)]">
           {conclusion.content || "—"}
         </p>
-      </div>
+      </Surface>
 
-      <div className="mt-3 flex flex-wrap items-center gap-2 border-t-2 border-[var(--pixel-border)] pt-3 text-[11px] text-ctp-subtext0">
+      <div className="ui-compact-text mt-3 flex flex-wrap items-center gap-2 border-t-2 border-[var(--pixel-border)] pt-3 text-[var(--text-muted)]">
         <CopyIdButton
           id={conclusion.id}
           copiedId={copiedId}
@@ -175,10 +177,10 @@ function ConclusionListItem({
           aria-label={isDeleting ? "Deleting conclusion" : "Delete conclusion"}
           title={isDeleting ? "Deleting conclusion" : "Delete conclusion"}
         >
-          <i aria-hidden className="hn hn-trash text-[12px] leading-none" />
+          <i aria-hidden className="hn hn-trash ui-compact-text" />
         </button>
       </div>
-    </li>
+    </Surface>
   );
 }
 
@@ -376,7 +378,7 @@ export function ConclusionsPanel({
   return (
     <section className="flex min-h-0 flex-col gap-2 overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.06em] text-ctp-subtext0">
+        <h2 className="ui-section-label">
           Conclusions ({conclusions.total})
         </h2>
 
@@ -389,7 +391,7 @@ export function ConclusionsPanel({
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-2 border-[var(--pixel-border)] bg-ctp-mantle shadow-[var(--pixel-shadow-md)]">
+      <Surface className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <div className="space-y-3 border-b-2 border-[var(--pixel-border)] p-4 sm:px-6">
           <ConclusionsControls
             peerIds={peerIds}
@@ -444,9 +446,9 @@ export function ConclusionsPanel({
           onNext={pagination.onNext}
           onLast={pagination.onLast}
         />
-      </div>
+      </Surface>
 
-      {error ? <p className="text-xs text-ctp-red">{error}</p> : null}
+      {error ? <p className="text-xs text-[var(--color-danger)]">{error}</p> : null}
     </section>
   );
 }

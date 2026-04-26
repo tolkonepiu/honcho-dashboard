@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Surface } from "@/components/ui/surface";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TableRefreshButton } from "@/components/ui/table-controls";
 import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
@@ -13,14 +14,14 @@ type PeerCardSectionProps = {
 };
 
 const cardActionButtonBaseClass =
-  "inline-flex h-8 w-8 items-center justify-center border shadow-[var(--pixel-shadow-sm)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle disabled:cursor-not-allowed disabled:border-ctp-surface0 disabled:bg-ctp-mantle disabled:text-ctp-overlay0 disabled:shadow-none";
+  "inline-flex h-8 w-8 items-center justify-center border shadow-[var(--pixel-shadow-sm)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_srgb,var(--color-accent)_70%,transparent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--surface-elevated)] disabled:cursor-not-allowed disabled:border-[var(--surface-border-muted)] disabled:bg-[var(--surface-elevated)] disabled:text-[var(--text-dim)] disabled:shadow-none";
 
-const neutralCardActionButtonClass = `${cardActionButtonBaseClass} border-[var(--pixel-border)] bg-ctp-crust text-ctp-subtext0 hover:bg-ctp-surface0 hover:text-ctp-text`;
+const neutralCardActionButtonClass = `${cardActionButtonBaseClass} border-[var(--pixel-border)] bg-[var(--surface-strong)] text-[var(--text-muted)] hover:bg-[var(--surface-interactive)] hover:text-[var(--text-primary)]`;
 
 const editCardActionButtonClass =
-  "inline-flex h-8 w-8 items-center justify-center text-ctp-subtext0 transition-colors hover:text-ctp-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle disabled:cursor-not-allowed disabled:text-ctp-overlay0";
+  "inline-flex h-8 w-8 items-center justify-center text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_srgb,var(--color-accent)_70%,transparent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--surface-elevated)] disabled:cursor-not-allowed disabled:text-[var(--text-dim)]";
 
-const acceptCardActionButtonClass = `${cardActionButtonBaseClass} border-ctp-green/70 bg-ctp-green/20 text-ctp-green hover:bg-ctp-green/30`;
+const acceptCardActionButtonClass = `${cardActionButtonBaseClass} border-[color:color-mix(in_srgb,var(--color-success)_70%,transparent)] bg-[color:color-mix(in_srgb,var(--color-success)_20%,transparent)] text-[var(--color-success)] hover:bg-[color:color-mix(in_srgb,var(--color-success)_30%,transparent)]`;
 
 function formatCardText(card: string[] | null): string {
   return (card ?? []).join("\n");
@@ -158,7 +159,7 @@ export function PeerCardSection({
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.06em] text-ctp-subtext0">
+        <h2 className="ui-section-label">
           Peer Card
         </h2>
 
@@ -175,7 +176,7 @@ export function PeerCardSection({
                 aria-label={isSaving ? "Saving peer card" : "Accept peer card"}
                 title={isSaving ? "Saving peer card" : "Accept peer card"}
               >
-                <i aria-hidden className="hn hn-check-solid text-[14px] leading-none" />
+                <i aria-hidden className="hn hn-check-solid ui-icon-sm" />
               </button>
 
               <button
@@ -190,7 +191,7 @@ export function PeerCardSection({
                 aria-label="Cancel editing peer card"
                 title="Cancel editing peer card"
               >
-                <i aria-hidden className="hn hn-times-solid text-[14px] leading-none" />
+                <i aria-hidden className="hn hn-times-solid ui-icon-sm" />
               </button>
             </>
           ) : (
@@ -207,7 +208,7 @@ export function PeerCardSection({
                 aria-label="Edit peer card"
                 title="Edit peer card"
               >
-                <i aria-hidden className="hn hn-pencil-solid text-[14px] leading-none" />
+                <i aria-hidden className="hn hn-pencil-solid ui-icon-sm" />
               </button>
 
               <TableRefreshButton
@@ -228,10 +229,10 @@ export function PeerCardSection({
           description="This peer has no card entries yet."
         />
       ) : (
-        <div
-          className={`overflow-hidden border-2 border-[var(--pixel-border)] bg-ctp-mantle shadow-[var(--pixel-shadow-md)] ${
+        <Surface
+          className={`overflow-hidden ${
             isEditing
-              ? "focus-within:border-ctp-lavender focus-within:ring-2 focus-within:ring-ctp-lavender/70 focus-within:ring-offset-1 focus-within:ring-offset-ctp-mantle"
+              ? "focus-within:border-[var(--color-accent)] focus-within:ring-2 focus-within:ring-[color:color-mix(in_srgb,var(--color-accent)_70%,transparent)] focus-within:ring-offset-1 focus-within:ring-offset-[var(--surface-elevated)]"
               : ""
           }`}
         >
@@ -244,19 +245,19 @@ export function PeerCardSection({
                 resizeDraftTextarea(event.currentTarget);
               }}
               disabled={isBusy}
-              className="block min-h-44 w-full resize-y border-0 bg-transparent px-4 py-3 text-sm leading-6 text-ctp-text outline-none placeholder:text-ctp-overlay0 sm:px-5"
+              className="block min-h-44 w-full resize-y border-0 bg-transparent px-4 py-3 text-sm leading-6 text-[var(--text-primary)] outline-none placeholder:text-[var(--text-dim)] sm:px-5"
               placeholder="Enter peer card content"
               aria-label="Edit peer card"
             />
           ) : (
-            <p className="px-4 py-3 break-normal hyphens-none whitespace-pre-wrap text-sm leading-6 text-ctp-text sm:px-5">
+            <p className="px-4 py-3 break-normal hyphens-none whitespace-pre-wrap text-sm leading-6 text-[var(--text-primary)] sm:px-5">
               {readCardText || "—"}
             </p>
           )}
-        </div>
+        </Surface>
       )}
 
-      {error ? <p className="text-xs text-ctp-red">{error}</p> : null}
+      {error ? <p className="text-xs text-[var(--color-danger)]">{error}</p> : null}
     </section>
   );
 }

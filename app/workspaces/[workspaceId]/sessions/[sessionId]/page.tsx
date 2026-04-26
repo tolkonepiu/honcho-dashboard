@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import type { ReactNode } from "react";
+import { Badge } from "@/components/ui/badge";
 import { HonchoErrorState } from "@/components/ui/honcho-error-state";
+import { JsonPanel } from "@/components/ui/json-panel";
 import { PageHeaderActions } from "@/components/ui/page-header-actions";
 import { RelativeTime } from "@/components/ui/relative-time";
+import { StatCard } from "@/components/ui/stat-card";
 import {
   type DashboardMessage,
   type DashboardPeer,
@@ -21,65 +22,6 @@ import { SessionPeersSection } from "./session-peers-section";
 type Props = {
   params: Promise<{ workspaceId: string; sessionId: string }>;
 };
-
-type StatCardProps = {
-  label: string;
-  value: ReactNode;
-  className?: string;
-  href?: string;
-};
-
-type JsonPanelProps = {
-  title: string;
-  value: Record<string, unknown>;
-};
-
-function StatCard({ label, value, className, href }: StatCardProps) {
-  const classes = `border-2 border-[var(--pixel-border)] bg-ctp-mantle p-4 shadow-[var(--pixel-shadow-md)]${
-    href
-      ? " transition-[background-color,border-color,transform] hover:-translate-y-px hover:border-ctp-lavender hover:bg-ctp-surface0"
-      : ""
-  }${className ? ` ${className}` : ""}`;
-
-  const content = (
-    <>
-      <dt className="text-xs font-semibold uppercase tracking-[0.06em] text-ctp-subtext0">
-        {label}
-      </dt>
-      <dd className="mt-2 text-xl font-semibold text-ctp-text">{value}</dd>
-    </>
-  );
-
-  if (href) {
-    return (
-      <Link href={href} className={classes}>
-        {content}
-      </Link>
-    );
-  }
-
-  return <div className={classes}>{content}</div>;
-}
-
-function JsonPanel({ title, value }: JsonPanelProps) {
-  if (Object.keys(value).length === 0) {
-    return null;
-  }
-
-  return (
-    <section className="space-y-3">
-      <h2 className="text-xs font-semibold uppercase tracking-[0.06em] text-ctp-subtext0">
-        {title}
-      </h2>
-
-      <div className="overflow-hidden border-2 border-[var(--pixel-border)] bg-ctp-mantle shadow-[var(--pixel-shadow-md)]">
-        <pre className="overflow-x-auto whitespace-pre-wrap break-words p-4 font-mono text-xs leading-5 text-ctp-subtext1 sm:px-6">
-          {JSON.stringify(value, null, 2)}
-        </pre>
-      </div>
-    </section>
-  );
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { sessionId } = await params;
@@ -130,10 +72,10 @@ export default async function SessionDetailPage({ params }: Props) {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight text-ctp-text">
+          <h1 className="text-2xl font-semibold tracking-tight text-[var(--text-primary)]">
             {session.id}
           </h1>
-          <p className="text-sm text-ctp-subtext0">
+          <p className="text-sm text-[var(--text-muted)]">
             Created <RelativeTime value={session.createdAt} />
           </p>
         </div>
@@ -154,15 +96,9 @@ export default async function SessionDetailPage({ params }: Props) {
         <StatCard
           label="Status"
           value={
-            <span
-              className={`inline-flex whitespace-nowrap border px-2 py-0.5 text-xs font-semibold uppercase tracking-[0.04em] shadow-[var(--pixel-shadow-sm)] ${
-                session.isActive
-                  ? "border-ctp-green/70 bg-ctp-green/20 text-ctp-green"
-                  : "border-[var(--pixel-border)] bg-ctp-crust text-ctp-subtext0"
-              }`}
-            >
+            <Badge variant={session.isActive ? "success" : "neutral"}>
               {session.isActive ? "Active" : "Inactive"}
-            </span>
+            </Badge>
           }
         />
         <StatCard

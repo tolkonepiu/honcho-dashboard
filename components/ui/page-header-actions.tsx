@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { cn } from "@/lib/cn";
 import { TableRefreshButton } from "@/components/ui/table-controls";
 import { TypedConfirmationDialog } from "@/components/ui/typed-confirmation-dialog";
 import { dispatchPageRefreshSignal } from "@/hooks/use-page-refresh-signal";
@@ -20,7 +21,7 @@ type PageHeaderActionsProps = {
 };
 
 const deleteTriggerClass =
-  "inline-flex h-8 w-8 items-center justify-center text-ctp-red/80 transition-colors hover:text-ctp-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-red focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle disabled:cursor-not-allowed disabled:text-ctp-overlay0";
+  "inline-flex h-8 w-8 items-center justify-center text-[color:color-mix(in_srgb,var(--color-danger)_80%,transparent)] transition-colors hover:text-[var(--color-danger)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-danger)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--surface-elevated)] disabled:cursor-not-allowed disabled:text-[var(--text-dim)]";
 
 export function PageHeaderActions({
   refreshLabel,
@@ -106,7 +107,7 @@ export function PageHeaderActions({
             aria-label={`Delete ${deleteAction.entityLabel.toLowerCase()}`}
             title={`Delete ${deleteAction.entityLabel.toLowerCase()}`}
           >
-            <i aria-hidden className="hn hn-trash text-[16px] leading-none" />
+            <i aria-hidden className={cn("hn hn-trash ui-icon-md")} />
           </button>
         ) : null}
 
