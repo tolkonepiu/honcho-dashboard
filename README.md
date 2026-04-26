@@ -1,12 +1,15 @@
-# Honcho Dashboard
+<!-- markdownlint-disable -->
+<h1 align="center">
+	<img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/misc/transparent.png" height="30" width="0px"/>
+	Honcho Dashboard</br>
+</h1>
 
-An unofficial dashboard for
-[Honcho by Plastic Labs](https://github.com/plastic-labs/honcho).
-
-This project provides a lightweight web UI for exploring data in a Honcho
-instance: workspaces, peers, sessions, messages, and conclusions.
-
-![Honcho Dashboard screenshot](./.github/assets/screenshot.png)
+<p align="center">
+  An unofficial dashboard for <a href="https://github.com/plastic-labs/honcho">Honcho by Plastic Labs</a>.</br>
+  <img src="https://raw.githubusercontent.com/catppuccin/catppuccin/main/assets/misc/transparent.png" height="30" width="0px"/>
+  <img src="./.github/assets/preview.webp" alt="Honcho Dashboard Preview"/>
+</p>
+<!-- markdownlint-enable -->
 
 > [!NOTE]
 >
@@ -15,34 +18,22 @@ instance: workspaces, peers, sessions, messages, and conclusions.
 
 ## Quick start
 
-Install dependencies:
+Run the dashboard with Docker:
 
 ```bash
-npm install
+docker run -e HONCHO_BASE_URL=http://localhost:8000 -p 3000:3000 ghcr.io/tolkonepiu/honcho-dashboard:latest
 ```
 
-Build the app first:
-
-```bash
-npm run build
-```
-
-Set the environment variables before starting the app:
+Available environment variables:
 
 - `HONCHO_BASE_URL` — required, the base URL of your Honcho instance
 - `HONCHO_API_KEY` — optional, required only if your Honcho instance is
   protected by an API key
 
-Example:
-
-```bash
-HONCHO_BASE_URL=http://your-honcho-instance-url npm run start
-```
-
 If your instance requires authentication:
 
 ```bash
-HONCHO_BASE_URL=http://your-honcho-instance-url HONCHO_API_KEY=your-api-key npm run start
+docker run -e HONCHO_BASE_URL=http://localhost:8000 -e HONCHO_API_KEY=your-api-key -p 3000:3000 ghcr.io/tolkonepiu/honcho-dashboard:latest
 ```
 
 Then open [http://localhost:3000](http://localhost:3000).
