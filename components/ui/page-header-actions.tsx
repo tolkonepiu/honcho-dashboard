@@ -20,7 +20,7 @@ type PageHeaderActionsProps = {
 };
 
 const deleteTriggerClass =
-  "inline-flex h-8 w-8 items-center justify-center border border-ctp-red bg-ctp-red/20 text-ctp-red shadow-[var(--pixel-shadow-sm)] transition-colors hover:bg-ctp-red/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-red/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle disabled:cursor-not-allowed disabled:border-ctp-surface0 disabled:bg-ctp-surface0 disabled:text-ctp-overlay0";
+  "inline-flex h-8 w-8 items-center justify-center text-ctp-red/80 transition-colors hover:text-ctp-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-red focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle disabled:cursor-not-allowed disabled:text-ctp-overlay0";
 
 export function PageHeaderActions({
   refreshLabel,
