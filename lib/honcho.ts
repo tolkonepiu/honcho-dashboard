@@ -537,6 +537,24 @@ export async function getPeerCard(
   return response.peer_card;
 }
 
+export async function setPeerCard(
+  workspaceId: string,
+  peerId: string,
+  peerCard: string[] | null,
+): Promise<string[] | null> {
+  const client = createClient(workspaceId);
+  const response = await runHonchoRequest(() =>
+    client.http.put<{ peer_card: string[] | null }>(
+      `${peerPath(workspaceId, peerId)}/card`,
+      {
+        body: { peer_card: peerCard },
+      },
+    ),
+  );
+
+  return response.peer_card;
+}
+
 export async function getSession(
   workspaceId: string,
   sessionId: string,
