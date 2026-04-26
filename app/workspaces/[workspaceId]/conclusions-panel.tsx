@@ -177,7 +177,7 @@ function ConclusionListItem({
           aria-label={isDeleting ? "Deleting conclusion" : "Delete conclusion"}
           title={isDeleting ? "Deleting conclusion" : "Delete conclusion"}
         >
-          <i aria-hidden className="hn hn-trash ui-compact-text" />
+          <i aria-hidden className="hn hn-trash ui-icon-sm" />
         </button>
       </div>
     </Surface>
