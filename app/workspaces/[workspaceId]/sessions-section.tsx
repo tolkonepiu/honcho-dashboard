@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import { ClickableTableRow } from "@/components/ui/clickable-table-row";
 import { DataSection } from "@/components/ui/data-section";
 import { JsonCell } from "@/components/ui/json-cell";
@@ -103,7 +104,7 @@ export function SessionsSection({
     >
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-ctp-crust text-xs uppercase tracking-[0.05em] text-ctp-subtext0">
+          <thead className="ui-table-head">
             <tr>
               <th scope="col" className="px-4 py-3 font-medium sm:px-6">
                 Session ID
@@ -127,7 +128,7 @@ export function SessionsSection({
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-ctp-surface0">
+          <tbody className="divide-y divide-[var(--surface-border-muted)]">
             {sessions.items.map((session) => {
               const href = `${base}/${encodeURIComponent(session.id)}`;
 
@@ -135,29 +136,23 @@ export function SessionsSection({
                 <ClickableTableRow
                   href={href}
                   key={session.id}
-                  className="group hover:bg-transparent"
+                  className="group"
                 >
-                  <td className="px-4 py-3 font-medium text-ctp-text sm:px-6">
+                  <td className="px-4 py-3 font-medium text-[var(--text-primary)] sm:px-6">
                     <Link
                       href={href}
                       title={session.id}
-                      className="block whitespace-normal break-words truncate underline-offset-2 transition-colors group-hover:text-ctp-lavender hover:underline"
+                        className="block whitespace-normal break-words truncate underline-offset-2 transition-colors group-hover:text-[var(--color-accent)] hover:underline"
                     >
                       {session.id}
                     </Link>
                   </td>
                   <td className="px-4 py-3 sm:px-6">
-                    <span
-                      className={`inline-flex whitespace-nowrap border px-2 py-0.5 text-xs font-semibold uppercase tracking-[0.04em] shadow-[var(--pixel-shadow-sm)] ${
-                        session.isActive
-                          ? "border-ctp-green/70 bg-ctp-green/20 text-ctp-green"
-                          : "border-[var(--pixel-border)] bg-ctp-crust text-ctp-subtext0"
-                      }`}
-                    >
+                    <Badge variant={session.isActive ? "success" : "neutral"}>
                       {session.isActive ? "Active" : "Inactive"}
-                    </span>
+                    </Badge>
                   </td>
-                  <td className="px-4 py-3 text-xs leading-5 text-ctp-subtext0 sm:px-6 sm:text-sm">
+                  <td className="px-4 py-3 text-xs leading-5 text-[var(--text-muted)] sm:px-6 sm:text-sm">
                     <RelativeTime value={session.createdAt} />
                   </td>
                   {showMetadataColumns ? (

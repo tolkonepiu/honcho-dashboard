@@ -1,6 +1,8 @@
 "use client";
 
 import { type FormEvent, useEffect, useId, useRef } from "react";
+import { dangerButtonClass, subtleButtonClass } from "@/components/ui/button-styles";
+import { Surface } from "@/components/ui/surface";
 
 type TypedConfirmationDialogProps = {
   isOpen: boolean;
@@ -17,12 +19,6 @@ type TypedConfirmationDialogProps = {
   isConfirmDisabled: boolean;
   error: string | null;
 };
-
-const secondaryButtonClass =
-  "inline-flex h-8 items-center justify-center border border-[var(--pixel-border)] bg-ctp-crust px-3 text-xs font-semibold uppercase tracking-[0.05em] text-ctp-subtext0 shadow-[var(--pixel-shadow-sm)] transition-colors hover:bg-ctp-surface0 hover:text-ctp-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle disabled:cursor-not-allowed disabled:border-ctp-surface0 disabled:bg-ctp-surface0 disabled:text-ctp-overlay0 disabled:shadow-none";
-
-const dangerButtonClass =
-  "inline-flex h-8 items-center justify-center border border-ctp-red bg-ctp-red/20 px-3 text-xs font-semibold uppercase tracking-[0.05em] text-ctp-red shadow-[var(--pixel-shadow-sm)] transition-colors hover:bg-ctp-red/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-red/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle disabled:cursor-not-allowed disabled:border-ctp-surface0 disabled:bg-ctp-surface0 disabled:text-ctp-overlay0 disabled:shadow-none";
 
 export function TypedConfirmationDialog({
   isOpen,
@@ -88,41 +84,36 @@ export function TypedConfirmationDialog({
   return (
     <div
       role="presentation"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ctp-base/80 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--surface-overlay)] p-4"
     >
-      <div
+      <Surface
+        as="section"
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className="w-full max-w-md border-2 border-[var(--pixel-border)] bg-ctp-mantle p-4 shadow-[var(--pixel-shadow-md)]"
+        className="w-full max-w-md p-4"
       >
         <form className="space-y-4" onSubmit={onSubmit}>
           <div className="space-y-1">
-            <h2
-              id={titleId}
-              className="text-sm font-semibold uppercase tracking-[0.06em] text-ctp-text"
-            >
+            <h2 id={titleId} className="ui-title">
               {title}
             </h2>
-            <p
-              id={descriptionId}
-              className="text-xs leading-5 text-ctp-subtext0"
-            >
+            <p id={descriptionId} className="text-xs leading-5 text-[var(--text-muted)]">
               {description}
             </p>
           </div>
 
           <div className="space-y-2">
-            <p className="text-xs uppercase tracking-[0.05em] text-ctp-subtext0">
+            <p className="ui-section-label">
               Enter this exact ID to enable deletion:
             </p>
-            <p className="border-2 border-[var(--pixel-border)] bg-ctp-crust px-2.5 py-2 font-mono text-[11px] text-ctp-text shadow-[var(--pixel-shadow-sm)]">
+            <p className="ui-surface-subtle ui-compact-text px-2.5 py-2 font-mono text-[var(--text-primary)]">
               {expectedValue}
             </p>
             <label
               htmlFor={inputId}
-              className="block text-xs font-semibold uppercase tracking-[0.05em] text-ctp-subtext0"
+              className="ui-section-label block"
             >
               Confirm ID
             </label>
@@ -138,18 +129,18 @@ export function TypedConfirmationDialog({
               onChange={(event) => {
                 onTypedValueChange(event.target.value);
               }}
-              className="w-full border-2 border-[var(--pixel-border)] bg-ctp-crust px-2.5 py-2 text-sm text-ctp-text shadow-[var(--pixel-shadow-sm)] outline-none transition-colors focus:border-ctp-lavender focus-visible:ring-2 focus-visible:ring-ctp-lavender/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle"
+              className="ui-input focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_srgb,var(--color-accent)_70%,transparent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--surface-elevated)]"
             />
           </div>
 
-          {error ? <p className="text-xs text-ctp-red">{error}</p> : null}
+          {error ? <p className="text-xs text-[var(--color-danger)]">{error}</p> : null}
 
           <div className="flex items-center justify-end gap-2">
             <button
               type="button"
               onClick={onCancel}
               disabled={isPending}
-              className={secondaryButtonClass}
+              className={subtleButtonClass}
             >
               Cancel
             </button>
@@ -162,7 +153,7 @@ export function TypedConfirmationDialog({
             </button>
           </div>
         </form>
-      </div>
+      </Surface>
     </div>
   );
 }

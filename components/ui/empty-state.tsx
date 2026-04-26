@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { cn } from "@/lib/cn";
+import { Surface } from "@/components/ui/surface";
 
 type EmptyStateProps = {
   title: string;
@@ -8,10 +10,6 @@ type EmptyStateProps = {
   className?: string;
 };
 
-function buildClassName(base: string, className?: string) {
-  return className ? `${base} ${className}` : base;
-}
-
 export function EmptyState({
   title,
   description,
@@ -20,29 +18,29 @@ export function EmptyState({
   className,
 }: EmptyStateProps) {
   return (
-    <section
-      className={buildClassName(
-        "border-2 border-[var(--pixel-border)] bg-ctp-mantle px-5 py-8 text-center shadow-[var(--pixel-shadow-md)]",
-        className,
-      )}
+    <Surface
+      as="section"
+      className={cn("px-5 py-8 text-center", className)}
     >
       <div className="mx-auto flex max-w-md flex-col items-center gap-3">
         {icon ? (
-          <div className="flex h-10 w-10 items-center justify-center border-2 border-[var(--pixel-border)] bg-ctp-crust text-ctp-subtext0 shadow-[var(--pixel-shadow-sm)]">
+          <div className="ui-surface-subtle flex h-10 w-10 items-center justify-center text-[var(--text-muted)]">
             {icon}
           </div>
         ) : null}
 
-        <h2 className="text-sm font-semibold uppercase tracking-[0.06em] text-ctp-text">
+        <h2 className="ui-title">
           {title}
         </h2>
 
         {description ? (
-          <p className="text-xs leading-5 text-ctp-subtext0">{description}</p>
+          <p className="text-xs leading-5 text-[var(--text-muted)]">
+            {description}
+          </p>
         ) : null}
 
         {action ? <div className="pt-2">{action}</div> : null}
       </div>
-    </section>
+    </Surface>
   );
 }

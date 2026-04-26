@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { subtleButtonClass } from "@/components/ui/button-styles";
 
 export default function ErrorPage({
   error,
@@ -15,16 +16,16 @@ export default function ErrorPage({
 
   return (
     <div className="flex min-h-[50dvh] flex-col items-center justify-center gap-4 px-4 text-center">
-      <h2 className="text-lg font-semibold text-ctp-text">
+      <h2 className="text-lg font-semibold text-[var(--text-primary)]">
         Something went wrong
       </h2>
-      <p className="text-sm text-ctp-subtext0">
+      <p className="text-sm text-[var(--text-muted)]">
         {error.message || "An unexpected error occurred."}
       </p>
       <button
         type="button"
         onClick={() => unstable_retry()}
-        className="rounded-md border border-ctp-surface1 px-4 py-2 text-sm font-medium text-ctp-text transition-colors hover:bg-ctp-surface0"
+        className={subtleButtonClass}
       >
         Try again
       </button>

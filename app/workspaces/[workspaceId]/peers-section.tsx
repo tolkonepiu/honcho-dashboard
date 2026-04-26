@@ -100,7 +100,7 @@ export function PeersSection({
     >
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-ctp-crust/90 text-xs uppercase tracking-wide text-ctp-subtext0">
+          <thead className="ui-table-head tracking-wide">
             <tr>
               <th scope="col" className="px-4 py-3 font-medium sm:px-6">
                 Peer ID
@@ -121,21 +121,21 @@ export function PeersSection({
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-ctp-surface0">
+          <tbody className="divide-y divide-[var(--surface-border-muted)]">
             {peers.items.map((peer) => {
               const href = `${base}/${encodeURIComponent(peer.id)}`;
 
               return (
                 <ClickableTableRow href={href} key={peer.id} className="group">
-                  <td className="px-4 py-3 font-medium text-ctp-text sm:px-6">
+                  <td className="px-4 py-3 font-medium text-[var(--text-primary)] sm:px-6">
                     <Link
                       href={href}
-                      className="inline-flex rounded-sm underline-offset-2 transition-colors group-hover:text-ctp-lavender hover:underline"
+                        className="inline-flex rounded-sm underline-offset-2 transition-colors group-hover:text-[var(--color-accent)] hover:underline"
                     >
                       {peer.id}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-ctp-subtext0 sm:px-6">
+                  <td className="px-4 py-3 text-[var(--text-muted)] sm:px-6">
                     <RelativeTime value={peer.createdAt} />
                   </td>
                   {showMetadataColumns ? (

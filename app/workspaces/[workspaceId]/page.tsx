@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HonchoErrorState } from "@/components/ui/honcho-error-state";
+import { JsonPanel } from "@/components/ui/json-panel";
 import { PageHeaderActions } from "@/components/ui/page-header-actions";
 import { RelativeTime } from "@/components/ui/relative-time";
+import { StatCard } from "@/components/ui/stat-card";
 import { parsePositiveInteger } from "@/lib/api-utils";
 import {
   type DashboardConclusion,
@@ -45,66 +46,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 function getSingleSearchParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
-}
-
-type StatCardProps = {
-  label: string;
-  value: number;
-  href?: string;
-};
-
-type JsonPanelProps = {
-  title: string;
-  value: Record<string, unknown>;
-};
-
-function StatCard({ label, value, href }: StatCardProps) {
-  const content = (
-    <>
-      <dt className="text-xs font-semibold uppercase tracking-[0.06em] text-ctp-subtext0">
-        {label}
-      </dt>
-      <dd className="mt-2 text-3xl font-semibold uppercase tracking-[0.04em] text-ctp-text">
-        {value.toLocaleString()}
-      </dd>
-    </>
-  );
-
-  const classes =
-    "border-2 border-[var(--pixel-border)] bg-ctp-mantle p-4 shadow-[var(--pixel-shadow-md)] transition-colors";
-
-  if (href) {
-    return (
-      <Link
-        href={href}
-        className={`${classes} hover:border-ctp-lavender hover:bg-ctp-surface0`}
-      >
-        {content}
-      </Link>
-    );
-  }
-
-  return <div className={classes}>{content}</div>;
-}
-
-function JsonPanel({ title, value }: JsonPanelProps) {
-  if (Object.keys(value).length === 0) {
-    return null;
-  }
-
-  return (
-    <section className="space-y-3">
-      <h2 className="text-xs font-semibold uppercase tracking-[0.06em] text-ctp-subtext0">
-        {title}
-      </h2>
-
-      <div className="overflow-hidden border-2 border-[var(--pixel-border)] bg-ctp-mantle shadow-[var(--pixel-shadow-md)]">
-        <pre className="overflow-x-auto whitespace-pre-wrap break-words p-4 font-mono text-xs leading-5 text-ctp-subtext1 sm:px-6">
-          {JSON.stringify(value, null, 2)}
-        </pre>
-      </div>
-    </section>
-  );
 }
 
 export default async function WorkspaceDetailPage({
@@ -195,10 +136,10 @@ export default async function WorkspaceDetailPage({
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 space-y-1">
-          <h1 className="text-2xl font-semibold uppercase tracking-[0.05em] text-ctp-text">
+          <h1 className="text-2xl font-semibold uppercase tracking-[0.05em] text-[var(--text-primary)]">
             {workspaceId}
           </h1>
-          <p className="text-sm text-ctp-subtext0">
+          <p className="text-sm text-[var(--text-muted)]">
             Created <RelativeTime value={workspace.createdAt} />
           </p>
         </div>
@@ -217,15 +158,21 @@ export default async function WorkspaceDetailPage({
       <dl className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <StatCard
           label="Peers"
-          value={stats.peerCount}
+          value={stats.peerCount.toLocaleString()}
+          valueClassName="text-3xl uppercase tracking-[0.04em]"
           href={`${base}/peers`}
         />
         <StatCard
           label="Sessions"
-          value={stats.sessionCount}
+          value={stats.sessionCount.toLocaleString()}
+          valueClassName="text-3xl uppercase tracking-[0.04em]"
           href={`${base}/sessions`}
         />
-        <StatCard label="Conclusions" value={stats.conclusionCount} />
+        <StatCard
+          label="Conclusions"
+          value={stats.conclusionCount.toLocaleString()}
+          valueClassName="text-3xl uppercase tracking-[0.04em]"
+        />
       </dl>
 
       <div className="grid gap-6 lg:grid-cols-3">

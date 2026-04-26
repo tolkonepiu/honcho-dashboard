@@ -5,6 +5,7 @@ import { useCallback, useMemo, useState } from "react";
 import { ClickableTableRow } from "@/components/ui/clickable-table-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { RelativeTime } from "@/components/ui/relative-time";
+import { Surface } from "@/components/ui/surface";
 import { TablePager, TableRefreshButton } from "@/components/ui/table-controls";
 import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
 import { getApiErrorMessage } from "@/lib/api-client";
@@ -93,7 +94,7 @@ export function SessionPeersSection({
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.06em] text-ctp-subtext0">
+        <h2 className="ui-section-label">
           Peers ({peers.length})
         </h2>
 
@@ -112,10 +113,10 @@ export function SessionPeersSection({
           description="No peers are currently associated with this session."
         />
       ) : (
-        <div className="overflow-hidden border-2 border-[var(--pixel-border)] bg-ctp-mantle shadow-[var(--pixel-shadow-md)]">
+        <Surface className="overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-sm">
-              <thead className="bg-ctp-crust text-xs uppercase tracking-[0.05em] text-ctp-subtext0">
+              <thead className="ui-table-head">
                 <tr>
                   <th scope="col" className="px-4 py-3 font-medium sm:px-6">
                     Peer ID
@@ -126,7 +127,7 @@ export function SessionPeersSection({
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-ctp-surface0">
+              <tbody className="divide-y divide-[var(--surface-border-muted)]">
                 {visiblePeers.map((peer) => {
                   const href = `${peersBasePath}/${encodeURIComponent(peer.id)}`;
 
@@ -134,17 +135,17 @@ export function SessionPeersSection({
                     <ClickableTableRow
                       href={href}
                       key={peer.id}
-                      className="group hover:bg-transparent"
+                      className="group"
                     >
-                      <td className="px-4 py-3 font-medium text-ctp-text sm:px-6">
+                      <td className="px-4 py-3 font-medium text-[var(--text-primary)] sm:px-6">
                         <Link
                           href={href}
-                          className="inline-flex underline-offset-2 transition-colors group-hover:text-ctp-lavender hover:underline"
+                          className="inline-flex underline-offset-2 transition-colors group-hover:text-[var(--color-accent)] hover:underline"
                         >
                           {peer.id}
                         </Link>
                       </td>
-                      <td className="px-4 py-3 text-ctp-subtext0 sm:px-6">
+                      <td className="px-4 py-3 text-[var(--text-muted)] sm:px-6">
                         <RelativeTime value={peer.createdAt} />
                       </td>
                     </ClickableTableRow>
@@ -165,10 +166,10 @@ export function SessionPeersSection({
             onNext={() => setPage((previous) => Math.min(pages, previous + 1))}
             onLast={() => setPage(pages)}
           />
-        </div>
+        </Surface>
       )}
 
-      {error ? <p className="text-xs text-ctp-red">{error}</p> : null}
+      {error ? <p className="text-xs text-[var(--color-danger)]">{error}</p> : null}
     </section>
   );
 }

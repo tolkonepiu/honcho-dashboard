@@ -32,17 +32,17 @@ export function DashboardShell({
   const breadcrumbs = toBreadcrumbs(pathname);
 
   return (
-    <div className="min-h-[100dvh] bg-ctp-base text-ctp-text">
-      <header className="sticky top-0 z-20 border-b-2 border-[var(--pixel-border)] bg-ctp-mantle shadow-[0_3px_0_0_var(--color-ctp-crust)]">
+    <div className="min-h-[100dvh] bg-[var(--surface-base)] text-[var(--text-primary)]">
+      <header className="sticky top-0 z-20 border-b-2 border-[var(--pixel-border)] bg-[var(--surface-elevated)] shadow-[var(--pixel-shadow-md)]">
         <div className="mx-auto w-full max-w-screen-2xl px-4 sm:px-6">
           <div className="flex h-14 items-center gap-4">
             <Link
               href="/workspaces"
-              className="inline-flex min-w-0 items-center gap-2 border border-transparent px-1.5 py-1 text-xs font-bold uppercase tracking-[0.08em] text-ctp-text transition-colors hover:border-[var(--pixel-border)] hover:bg-ctp-surface0 hover:text-ctp-lavender"
+              className="inline-flex min-w-0 items-center gap-2 border border-transparent px-1.5 py-1 text-xs font-bold uppercase tracking-[0.08em] text-[var(--text-primary)] transition-colors hover:border-[var(--pixel-border)] hover:bg-[var(--surface-interactive)] hover:text-[var(--color-accent)]"
             >
               <i
                 aria-hidden
-                className="hn hn-analytics text-[18px] leading-none text-ctp-lavender"
+                className="hn hn-analytics ui-icon-lg text-[var(--color-accent)]"
               />
               <span className="truncate">Honcho Dashboard</span>
             </Link>
@@ -59,7 +59,7 @@ export function DashboardShell({
               ) : (
                 <div
                   aria-hidden
-                  className="h-5 w-full max-w-56 border border-[var(--pixel-border)] bg-ctp-surface0"
+                  className="h-5 w-full max-w-56 border border-[var(--pixel-border)] bg-[var(--surface-interactive)]"
                 />
               )}
             </div>

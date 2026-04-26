@@ -1,3 +1,5 @@
+import { cn } from "@/lib/cn";
+
 type TableRefreshButtonProps = {
   isPending: boolean;
   onRefresh: () => void;
@@ -17,16 +19,16 @@ type TablePagerProps = {
 };
 
 const refreshButtonClass =
-  "inline-flex h-8 w-8 items-center justify-center text-ctp-subtext0 transition-colors hover:text-ctp-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle disabled:cursor-not-allowed disabled:text-ctp-overlay0";
+  "inline-flex h-8 w-8 items-center justify-center text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_srgb,var(--color-accent)_70%,transparent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--surface-elevated)] disabled:cursor-not-allowed disabled:text-[var(--text-dim)]";
 
 const pagerButtonClass =
-  "inline-flex h-8 min-w-8 items-center justify-center border px-2 py-1 font-medium shadow-[var(--pixel-shadow-sm)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle";
+  "inline-flex h-8 min-w-8 items-center justify-center border px-2 py-1 font-medium shadow-[var(--pixel-shadow-sm)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_srgb,var(--color-accent)_70%,transparent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--surface-elevated)]";
 
 function RefreshIcon({ isPending }: { isPending: boolean }) {
   return (
     <i
       aria-hidden
-      className={`hn hn-refresh text-[14px] leading-none ${isPending ? "animate-spin" : ""}`}
+      className={cn("hn hn-refresh ui-icon-sm", isPending && "animate-spin")}
     />
   );
 }
@@ -43,10 +45,10 @@ function getRangeLabel(page: number, size: number, total: number) {
 
 function getPagerButtonStateClass(isEnabled: boolean, isPending: boolean) {
   if (isEnabled && !isPending) {
-    return "border-[var(--pixel-border)] bg-ctp-crust text-ctp-text hover:bg-ctp-surface0";
+    return "border-[var(--pixel-border)] bg-[var(--surface-strong)] text-[var(--text-primary)] hover:bg-[var(--surface-interactive)]";
   }
 
-  return "border-ctp-surface0 bg-ctp-mantle text-ctp-overlay0 shadow-none";
+  return "border-[var(--surface-border-muted)] bg-[var(--surface-elevated)] text-[var(--text-dim)] shadow-none";
 }
 
 export function TableRefreshButton({
@@ -86,7 +88,7 @@ export function TablePager({
   const pageRange = getRangeLabel(page, size, total);
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 border-t-2 border-[var(--pixel-border)] bg-ctp-base px-4 py-3 text-xs uppercase tracking-[0.04em] text-ctp-subtext0 sm:px-6">
+    <div className="flex flex-wrap items-center justify-between gap-2 border-t-2 border-[var(--pixel-border)] bg-[var(--surface-base)] px-4 py-3 text-xs uppercase tracking-[0.04em] text-[var(--text-muted)] sm:px-6">
       <p>
         {pageRange} of {total}
       </p>
@@ -101,7 +103,7 @@ export function TablePager({
         >
           <i
             aria-hidden
-            className="hn hn-angle-left-solid text-[14px] leading-none"
+            className="hn hn-angle-left-solid ui-icon-sm"
           />
         </button>
 
@@ -114,11 +116,11 @@ export function TablePager({
         >
           <i
             aria-hidden
-            className="hn hn-arrow-left-solid text-[14px] leading-none"
+            className="hn hn-arrow-left-solid ui-icon-sm"
           />
         </button>
 
-        <span className="inline-flex h-8 items-center border border-[var(--pixel-border)] bg-ctp-surface0 px-2.5 font-medium text-ctp-text shadow-[var(--pixel-shadow-sm)]">
+        <span className="inline-flex h-8 items-center border border-[var(--pixel-border)] bg-[var(--surface-interactive)] px-2.5 font-medium text-[var(--text-primary)] shadow-[var(--pixel-shadow-sm)]">
           {page} / {totalPages}
         </span>
 
@@ -131,7 +133,7 @@ export function TablePager({
         >
           <i
             aria-hidden
-            className="hn hn-arrow-right-solid text-[14px] leading-none"
+            className="hn hn-arrow-right-solid ui-icon-sm"
           />
         </button>
 
@@ -144,7 +146,7 @@ export function TablePager({
         >
           <i
             aria-hidden
-            className="hn hn-angle-right-solid text-[14px] leading-none"
+            className="hn hn-angle-right-solid ui-icon-sm"
           />
         </button>
       </div>
