@@ -115,6 +115,10 @@ function conclusionsPath(workspaceId: string): string {
   return `${workspacePath(workspaceId)}/conclusions`;
 }
 
+function conclusionPath(workspaceId: string, conclusionId: string): string {
+  return `${conclusionsPath(workspaceId)}/${encodeURIComponent(conclusionId)}`;
+}
+
 function pagePost<T>(
   client: Honcho,
   path: string,
@@ -714,5 +718,15 @@ export async function deleteSession(
   const client = createClient(workspaceId);
   await runHonchoRequest(() =>
     client.http.delete(sessionPath(workspaceId, sessionId)),
+  );
+}
+
+export async function deleteConclusion(
+  workspaceId: string,
+  conclusionId: string,
+): Promise<void> {
+  const client = createClient(workspaceId);
+  await runHonchoRequest(() =>
+    client.http.delete(conclusionPath(workspaceId, conclusionId)),
   );
 }

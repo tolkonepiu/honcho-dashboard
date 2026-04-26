@@ -64,10 +64,15 @@ function buildConclusionsApiUrl(
   return `/api/workspaces/${encodeURIComponent(workspaceId)}/conclusions?${params.toString()}`;
 }
 
+const deleteConclusionButtonClass =
+  "ml-auto inline-flex h-6 w-6 items-center justify-center text-ctp-red/60 transition-colors hover:text-ctp-red focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-red focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle disabled:cursor-not-allowed disabled:text-ctp-overlay0";
+
 type ConclusionListItemProps = {
   conclusion: ConclusionItem;
   copiedId: string | null;
+  isDeleting: boolean;
   onCopyId: (id: string) => void;
+  onDelete: (id: string) => void;
   onFilterObserver: (observerId: string) => void;
   onFilterObserved: (observedId: string) => void;
   onFilterSession: (sessionId: string) => void;
@@ -76,13 +81,15 @@ type ConclusionListItemProps = {
 function ConclusionListItem({
   conclusion,
   copiedId,
+  isDeleting,
   onCopyId,
+  onDelete,
   onFilterObserver,
   onFilterObserved,
   onFilterSession,
 }: ConclusionListItemProps) {
   return (
-    <li className="border-2 border-[var(--pixel-border)] bg-ctp-crust p-4 shadow-[var(--pixel-shadow-md)] transition-colors hover:border-ctp-lavender hover:bg-ctp-surface0">
+    <li className="border-2 border-[var(--pixel-border)] bg-ctp-crust p-4 shadow-[var(--pixel-shadow-md)] transition-colors">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-ctp-subtext0">
           <button
@@ -145,8 +152,8 @@ function ConclusionListItem({
         />
       </div>
 
-      <div className="mt-3 border-2 border-[var(--pixel-border)] bg-ctp-base px-3 py-2.5 shadow-[var(--pixel-shadow-sm)]">
-        <p className="break-words whitespace-pre-wrap text-sm leading-6 text-ctp-text">
+      <div className="mt-3 min-w-0 max-w-full overflow-hidden border-2 border-[var(--pixel-border)] bg-ctp-base px-3 py-2.5 shadow-[var(--pixel-shadow-sm)]">
+        <p className="min-w-0 max-w-full whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-sm leading-6 text-ctp-text">
           {conclusion.content || "—"}
         </p>
       </div>
@@ -157,6 +164,19 @@ function ConclusionListItem({
           copiedId={copiedId}
           onCopy={onCopyId}
         />
+
+        <button
+          type="button"
+          onClick={() => {
+            onDelete(conclusion.id);
+          }}
+          disabled={isDeleting}
+          className={deleteConclusionButtonClass}
+          aria-label={isDeleting ? "Deleting conclusion" : "Delete conclusion"}
+          title={isDeleting ? "Deleting conclusion" : "Delete conclusion"}
+        >
+          <i aria-hidden className="hn hn-trash text-[12px] leading-none" />
+        </button>
       </div>
     </li>
   );
@@ -174,6 +194,9 @@ export function ConclusionsPanel({
     useState<ConclusionsData>(initialConclusions);
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [deletingConclusionId, setDeletingConclusionId] = useState<
+    string | null
+  >(null);
   const [refreshNonce, setRefreshNonce] = useState(0);
   const isFirstRender = useRef(true);
   const requestId = useRef(0);
@@ -285,6 +308,49 @@ export function ConclusionsPanel({
     }
   };
 
+  const deleteConclusion = async (conclusionId: string) => {
+    if (deletingConclusionId) {
+      return;
+    }
+
+    setDeletingConclusionId(conclusionId);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `/api/workspaces/${encodeURIComponent(workspaceId)}/conclusions/${encodeURIComponent(conclusionId)}`,
+        {
+          method: "DELETE",
+          cache: "no-store",
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          await getApiErrorMessage(
+            response,
+            `Failed to delete conclusion (${response.status}).`,
+          ),
+        );
+      }
+
+      setConclusions((previous) => ({
+        ...previous,
+        items: previous.items.filter((item) => item.id !== conclusionId),
+        total: Math.max(0, previous.total - 1),
+      }));
+      setRefreshNonce((previous) => previous + 1);
+    } catch (deleteError) {
+      setError(
+        deleteError instanceof Error
+          ? deleteError.message
+          : "Failed to delete conclusion.",
+      );
+    } finally {
+      setDeletingConclusionId(null);
+    }
+  };
+
   const refreshConclusions = useCallback(() => {
     if (isPending) {
       return;
@@ -351,8 +417,12 @@ export function ConclusionsPanel({
                   key={conclusion.id}
                   conclusion={conclusion}
                   copiedId={copiedId}
+                  isDeleting={deletingConclusionId === conclusion.id}
                   onCopyId={(id) => {
                     void copyIdToClipboard(id);
+                  }}
+                  onDelete={(id) => {
+                    void deleteConclusion(id);
                   }}
                   onFilterObserver={filterByObserver}
                   onFilterObserved={filterByObserved}
