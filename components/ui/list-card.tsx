@@ -18,7 +18,7 @@ function buildClassName(base: string, className?: string) {
 
 export function ListCard({ children, href, className }: ListCardProps) {
   const classes = buildClassName(
-    "group relative block rounded-xl border border-ctp-surface0 bg-ctp-mantle p-4 shadow-sm transition-colors hover:border-ctp-surface1",
+    "group relative block border-2 border-[var(--pixel-border)] bg-ctp-mantle p-4 shadow-[var(--pixel-shadow-md)] transition-[background-color,border-color,transform] hover:-translate-y-px hover:border-ctp-lavender hover:bg-ctp-surface0",
     className,
   );
 
@@ -28,9 +28,9 @@ export function ListCard({ children, href, className }: ListCardProps) {
         {children}
         <span
           aria-hidden
-          className="absolute right-4 top-4 text-ctp-overlay0 transition-colors group-hover:text-ctp-subtext0"
+          className="absolute right-4 top-4 text-[10px] text-ctp-overlay0 transition-colors group-hover:text-ctp-lavender"
         >
-          →
+          <i className="hn hn-arrow-right-solid" />
         </span>
       </Link>
     );
@@ -49,7 +49,7 @@ export function ListCardTitle({ children, className }: ListCardSectionProps) {
   return (
     <h3
       className={buildClassName(
-        "text-base font-semibold tracking-tight text-ctp-text",
+        "text-sm font-semibold uppercase tracking-[0.05em] text-ctp-text",
         className,
       )}
     >
@@ -63,7 +63,7 @@ export function ListCardDescription({
   className,
 }: ListCardSectionProps) {
   return (
-    <p className={buildClassName("text-sm text-ctp-subtext0", className)}>
+    <p className={buildClassName("text-xs leading-5 text-ctp-subtext0", className)}>
       {children}
     </p>
   );
@@ -73,7 +73,7 @@ export function ListCardFooter({ children, className }: ListCardSectionProps) {
   return (
     <div
       className={buildClassName(
-        "mt-4 border-t border-ctp-surface0 pt-3 text-xs text-ctp-subtext1",
+        "mt-4 border-t-2 border-[var(--pixel-border)] pt-3 text-xs text-ctp-subtext1",
         className,
       )}
     >

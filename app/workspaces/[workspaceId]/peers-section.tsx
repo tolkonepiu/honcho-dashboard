@@ -23,6 +23,7 @@ type PeersSectionProps = {
   peersApiPath?: string;
   peersBasePath?: string;
   title?: string;
+  titleClassName?: string;
   emptyStateTitle?: string;
   emptyStateDescription?: string;
   showMetadataColumns?: boolean;
@@ -42,6 +43,7 @@ export function PeersSection({
   peersApiPath,
   peersBasePath,
   title,
+  titleClassName,
   emptyStateTitle,
   emptyStateDescription,
   showMetadataColumns,
@@ -87,6 +89,7 @@ export function PeersSection({
   return (
     <DataSection
       title={sectionTitle}
+      titleClassName={titleClassName}
       total={peers.total}
       isPending={isPending}
       onRefresh={refreshPeers}

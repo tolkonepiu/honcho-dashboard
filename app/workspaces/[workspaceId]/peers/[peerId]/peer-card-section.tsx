@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { TableRefreshButton } from "@/components/ui/table-controls";
 import { EmptyState } from "@/components/ui/empty-state";
+import { TableRefreshButton } from "@/components/ui/table-controls";
 import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
 import { getApiErrorMessage } from "@/lib/api-client";
 
@@ -82,7 +82,9 @@ export function PeerCardSection({
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-sm font-medium text-ctp-subtext0">Peer Card</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-[0.06em] text-ctp-subtext0">
+          Peer Card
+        </h2>
 
         <TableRefreshButton
           isPending={isPending}
@@ -99,8 +101,8 @@ export function PeerCardSection({
           description="This peer has no card entries yet."
         />
       ) : (
-        <div className="overflow-hidden rounded-xl border border-ctp-surface0 bg-ctp-mantle shadow-sm">
-          <ul className="divide-y divide-ctp-surface0">
+        <div className="overflow-hidden border-2 border-[var(--pixel-border)] bg-ctp-mantle shadow-[var(--pixel-shadow-md)]">
+          <ul className="divide-y divide-ctp-surface1">
             {cardItems.map((entry) => (
               <li key={entry.key} className="px-4 py-3 sm:px-5">
                 <p className="break-normal hyphens-none whitespace-pre-wrap text-sm leading-6 text-ctp-text">

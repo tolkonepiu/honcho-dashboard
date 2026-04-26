@@ -56,23 +56,23 @@ type StatCardProps = {
 function StatCard({ label, value, href }: StatCardProps) {
   const content = (
     <>
-      <dt className="text-xs font-medium uppercase tracking-wide text-ctp-subtext0">
+      <dt className="text-xs font-semibold uppercase tracking-[0.06em] text-ctp-subtext0">
         {label}
       </dt>
-      <dd className="mt-2 text-3xl font-semibold tracking-tight text-ctp-text">
+      <dd className="mt-2 text-3xl font-semibold uppercase tracking-[0.04em] text-ctp-text">
         {value.toLocaleString()}
       </dd>
     </>
   );
 
   const classes =
-    "rounded-xl border border-ctp-surface0 bg-ctp-mantle p-4 shadow-sm transition-colors";
+    "border-2 border-[var(--pixel-border)] bg-ctp-mantle p-4 shadow-[var(--pixel-shadow-md)] transition-colors";
 
   if (href) {
     return (
       <Link
         href={href}
-        className={`${classes} hover:border-ctp-surface1 hover:bg-ctp-surface0/40`}
+        className={`${classes} hover:border-ctp-lavender hover:bg-ctp-surface0`}
       >
         {content}
       </Link>
@@ -170,7 +170,7 @@ export default async function WorkspaceDetailPage({
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight text-ctp-text">
+          <h1 className="text-2xl font-semibold uppercase tracking-[0.05em] text-ctp-text">
             {workspaceId}
           </h1>
           <p className="text-sm text-ctp-subtext0">

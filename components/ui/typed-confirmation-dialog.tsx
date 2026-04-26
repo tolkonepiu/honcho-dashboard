@@ -19,10 +19,10 @@ type TypedConfirmationDialogProps = {
 };
 
 const secondaryButtonClass =
-  "inline-flex h-8 items-center justify-center rounded-md border border-ctp-surface1 px-3 text-xs font-medium text-ctp-subtext0 transition-colors hover:bg-ctp-surface0 hover:text-ctp-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle disabled:cursor-not-allowed disabled:border-ctp-surface0 disabled:text-ctp-overlay0";
+  "inline-flex h-8 items-center justify-center border border-[var(--pixel-border)] bg-ctp-crust px-3 text-xs font-semibold uppercase tracking-[0.05em] text-ctp-subtext0 shadow-[var(--pixel-shadow-sm)] transition-colors hover:bg-ctp-surface0 hover:text-ctp-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle disabled:cursor-not-allowed disabled:border-ctp-surface0 disabled:bg-ctp-surface0 disabled:text-ctp-overlay0 disabled:shadow-none";
 
 const dangerButtonClass =
-  "inline-flex h-8 items-center justify-center rounded-md border border-ctp-red/50 bg-ctp-red/20 px-3 text-xs font-semibold text-ctp-red transition-colors hover:bg-ctp-red/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-red/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle disabled:cursor-not-allowed disabled:border-ctp-surface0 disabled:bg-ctp-surface0 disabled:text-ctp-overlay0";
+  "inline-flex h-8 items-center justify-center border border-ctp-red bg-ctp-red/20 px-3 text-xs font-semibold uppercase tracking-[0.05em] text-ctp-red shadow-[var(--pixel-shadow-sm)] transition-colors hover:bg-ctp-red/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-red/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle disabled:cursor-not-allowed disabled:border-ctp-surface0 disabled:bg-ctp-surface0 disabled:text-ctp-overlay0 disabled:shadow-none";
 
 export function TypedConfirmationDialog({
   isOpen,
@@ -95,28 +95,31 @@ export function TypedConfirmationDialog({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className="w-full max-w-md rounded-xl border border-ctp-surface0 bg-ctp-mantle p-5 shadow-xl"
+        className="w-full max-w-md border-2 border-[var(--pixel-border)] bg-ctp-mantle p-4 shadow-[var(--pixel-shadow-md)]"
       >
         <form className="space-y-4" onSubmit={onSubmit}>
           <div className="space-y-1">
-            <h2 id={titleId} className="text-base font-semibold text-ctp-text">
+            <h2
+              id={titleId}
+              className="text-sm font-semibold uppercase tracking-[0.06em] text-ctp-text"
+            >
               {title}
             </h2>
-            <p id={descriptionId} className="text-sm text-ctp-subtext0">
+            <p id={descriptionId} className="text-xs leading-5 text-ctp-subtext0">
               {description}
             </p>
           </div>
 
           <div className="space-y-2">
-            <p className="text-xs text-ctp-subtext0">
+            <p className="text-xs uppercase tracking-[0.05em] text-ctp-subtext0">
               Enter this exact ID to enable deletion:
             </p>
-            <p className="rounded-md border border-ctp-surface0 bg-ctp-crust px-3 py-2 font-mono text-xs text-ctp-text">
+            <p className="border-2 border-[var(--pixel-border)] bg-ctp-crust px-2.5 py-2 font-mono text-[11px] text-ctp-text shadow-[var(--pixel-shadow-sm)]">
               {expectedValue}
             </p>
             <label
               htmlFor={inputId}
-              className="block text-xs font-medium text-ctp-subtext0"
+              className="block text-xs font-semibold uppercase tracking-[0.05em] text-ctp-subtext0"
             >
               Confirm ID
             </label>
@@ -132,7 +135,7 @@ export function TypedConfirmationDialog({
               onChange={(event) => {
                 onTypedValueChange(event.target.value);
               }}
-              className="w-full rounded-md border border-ctp-surface1 bg-ctp-crust px-3 py-2 text-sm text-ctp-text outline-none transition-colors focus:border-ctp-lavender focus-visible:ring-2 focus-visible:ring-ctp-lavender/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle"
+              className="w-full border-2 border-[var(--pixel-border)] bg-ctp-crust px-2.5 py-2 text-sm text-ctp-text shadow-[var(--pixel-shadow-sm)] outline-none transition-colors focus:border-ctp-lavender focus-visible:ring-2 focus-visible:ring-ctp-lavender/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle"
             />
           </div>
 

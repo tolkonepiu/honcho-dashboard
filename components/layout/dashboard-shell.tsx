@@ -24,19 +24,6 @@ function toBreadcrumbs(pathname: string): BreadcrumbItem[] {
   }));
 }
 
-function HonchoMark() {
-  return (
-    <span
-      aria-hidden
-      className="inline-grid h-4 w-4 grid-cols-3 items-end gap-0.5 rounded-[3px] bg-ctp-surface0 p-0.5"
-    >
-      <span className="h-3 rounded-sm bg-ctp-mauve" />
-      <span className="h-2 rounded-sm bg-ctp-blue" />
-      <span className="h-2.5 rounded-sm bg-ctp-teal" />
-    </span>
-  );
-}
-
 export function DashboardShell({
   children,
   headerActions,
@@ -46,14 +33,17 @@ export function DashboardShell({
 
   return (
     <div className="min-h-[100dvh] bg-ctp-base text-ctp-text">
-      <header className="sticky top-0 z-20 border-b border-ctp-surface0/80 bg-ctp-mantle/85 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b-2 border-[var(--pixel-border)] bg-ctp-mantle shadow-[0_3px_0_0_var(--color-ctp-crust)]">
         <div className="mx-auto w-full max-w-screen-2xl px-4 sm:px-6">
           <div className="flex h-14 items-center gap-4">
             <Link
               href="/workspaces"
-              className="inline-flex min-w-0 items-center gap-2 rounded-md px-1 py-1 text-sm font-semibold tracking-tight text-ctp-text transition-colors hover:text-ctp-lavender"
+              className="inline-flex min-w-0 items-center gap-2 border border-transparent px-1.5 py-1 text-xs font-bold uppercase tracking-[0.08em] text-ctp-text transition-colors hover:border-[var(--pixel-border)] hover:bg-ctp-surface0 hover:text-ctp-lavender"
             >
-              <HonchoMark />
+              <i
+                aria-hidden
+                className="hn hn-analytics text-[18px] leading-none text-ctp-lavender"
+              />
               <span className="truncate">Honcho Dashboard</span>
             </Link>
 
@@ -62,14 +52,14 @@ export function DashboardShell({
             ) : null}
           </div>
 
-          <div className="flex min-h-11 items-center border-t border-ctp-surface0/80 py-2">
+          <div className="flex min-h-11 items-center border-t border-[var(--pixel-border)] py-2">
             <div className="min-w-0 flex-1">
               {breadcrumbs.length > 0 ? (
                 <Breadcrumbs items={breadcrumbs} />
               ) : (
                 <div
                   aria-hidden
-                  className="h-5 w-full max-w-56 rounded bg-ctp-surface0/80"
+                  className="h-5 w-full max-w-56 border border-[var(--pixel-border)] bg-ctp-surface0"
                 />
               )}
             </div>

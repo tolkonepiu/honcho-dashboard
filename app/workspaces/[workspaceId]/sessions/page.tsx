@@ -49,13 +49,10 @@ export default async function SessionsPage({ params }: Props) {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight text-ctp-text">
-        Sessions
-      </h1>
-
       <SessionsSection
         workspaceId={workspaceId}
         initialSessions={initialSessions}
+        titleClassName="text-2xl font-semibold tracking-tight text-ctp-text"
         showMetadataColumns
       />
     </div>

@@ -49,13 +49,10 @@ export default async function PeersPage({ params }: Props) {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight text-ctp-text">
-        Peers
-      </h1>
-
       <PeersSection
         workspaceId={workspaceId}
         initialPeers={initialPeers}
+        titleClassName="text-2xl font-semibold tracking-tight text-ctp-text"
         showMetadataColumns
       />
     </div>

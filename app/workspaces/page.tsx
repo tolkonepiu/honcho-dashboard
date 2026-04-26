@@ -28,10 +28,6 @@ export default async function WorkspacesPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight text-ctp-text">
-        Workspaces
-      </h1>
-
       <WorkspacesTable initialWorkspaces={initialWorkspaces} />
     </div>
   );

@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { getApiErrorMessage } from "@/lib/api-client";
-import { dispatchPageRefreshSignal } from "@/hooks/use-page-refresh-signal";
+import { useState, useTransition } from "react";
 import { TableRefreshButton } from "@/components/ui/table-controls";
 import { TypedConfirmationDialog } from "@/components/ui/typed-confirmation-dialog";
+import { dispatchPageRefreshSignal } from "@/hooks/use-page-refresh-signal";
+import { getApiErrorMessage } from "@/lib/api-client";
 
 type DeleteAction = {
   entityId: string;
@@ -20,22 +20,7 @@ type PageHeaderActionsProps = {
 };
 
 const deleteTriggerClass =
-  "inline-flex h-7 w-7 items-center justify-center rounded-md border border-ctp-red/50 bg-ctp-red/15 text-ctp-red transition-colors hover:bg-ctp-red/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-red/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle disabled:cursor-not-allowed disabled:border-ctp-surface0 disabled:bg-ctp-surface0 disabled:text-ctp-overlay0";
-
-function TrashIcon() {
-  return (
-    <svg
-      aria-hidden
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 640 640"
-      fill="currentColor"
-      className="h-4 w-4"
-    >
-      <title>Delete</title>
-      <path d="M232.7 69.9L224 96L128 96C110.3 96 96 110.3 96 128C96 145.7 110.3 160 128 160L512 160C529.7 160 544 145.7 544 128C544 110.3 529.7 96 512 96L416 96L407.3 69.9C402.9 56.8 390.7 48 376.9 48L263.1 48C249.3 48 237.1 56.8 232.7 69.9zM512 208L128 208L149.1 531.1C150.7 556.4 171.7 576 197 576L443 576C468.3 576 489.3 556.4 490.9 531.1L512 208z" />
-    </svg>
-  );
-}
+  "inline-flex h-8 w-8 items-center justify-center border border-ctp-red bg-ctp-red/20 text-ctp-red shadow-[var(--pixel-shadow-sm)] transition-colors hover:bg-ctp-red/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-red/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle disabled:cursor-not-allowed disabled:border-ctp-surface0 disabled:bg-ctp-surface0 disabled:text-ctp-overlay0";
 
 export function PageHeaderActions({
   refreshLabel,
@@ -120,7 +105,7 @@ export function PageHeaderActions({
             aria-label={`Delete ${deleteAction.entityLabel.toLowerCase()}`}
             title={`Delete ${deleteAction.entityLabel.toLowerCase()}`}
           >
-            <TrashIcon />
+            <i aria-hidden className="hn hn-trash text-[16px] leading-none" />
           </button>
         ) : null}
 

@@ -93,7 +93,7 @@ export function SessionPeersSection({
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-sm font-medium text-ctp-subtext0">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.06em] text-ctp-subtext0">
           Peers ({peers.length})
         </h2>
 
@@ -112,10 +112,10 @@ export function SessionPeersSection({
           description="No peers are currently associated with this session."
         />
       ) : (
-        <div className="overflow-hidden rounded-xl border border-ctp-surface0 bg-ctp-mantle shadow-sm">
+        <div className="overflow-hidden border-2 border-[var(--pixel-border)] bg-ctp-mantle shadow-[var(--pixel-shadow-md)]">
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-sm">
-              <thead className="bg-ctp-crust/90 text-xs uppercase tracking-wide text-ctp-subtext0">
+              <thead className="bg-ctp-crust text-xs uppercase tracking-[0.05em] text-ctp-subtext0">
                 <tr>
                   <th scope="col" className="px-4 py-3 font-medium sm:px-6">
                     Peer ID
@@ -134,12 +134,12 @@ export function SessionPeersSection({
                     <ClickableTableRow
                       href={href}
                       key={peer.id}
-                      className="group"
+                      className="group hover:bg-transparent"
                     >
                       <td className="px-4 py-3 font-medium text-ctp-text sm:px-6">
                         <Link
                           href={href}
-                          className="inline-flex rounded-sm underline-offset-2 transition-colors group-hover:text-ctp-lavender hover:underline"
+                          className="inline-flex underline-offset-2 transition-colors group-hover:text-ctp-lavender hover:underline"
                         >
                           {peer.id}
                         </Link>

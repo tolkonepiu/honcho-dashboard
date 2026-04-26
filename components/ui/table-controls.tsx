@@ -17,29 +17,17 @@ type TablePagerProps = {
 };
 
 const refreshButtonClass =
-  "inline-flex h-7 w-7 items-center justify-center rounded-md border border-ctp-surface1 text-ctp-subtext0 transition-colors hover:bg-ctp-surface0 hover:text-ctp-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle disabled:cursor-not-allowed disabled:border-ctp-surface0 disabled:text-ctp-overlay0";
+  "inline-flex h-8 w-8 items-center justify-center text-ctp-subtext0 transition-colors hover:text-ctp-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle disabled:cursor-not-allowed disabled:text-ctp-overlay0";
 
 const pagerButtonClass =
-  "inline-flex min-w-8 items-center justify-center rounded-md border px-2 py-1 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle";
+  "inline-flex h-8 min-w-8 items-center justify-center border px-2 py-1 font-medium shadow-[var(--pixel-shadow-sm)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle";
 
 function RefreshIcon({ isPending }: { isPending: boolean }) {
   return (
-    <svg
+    <i
       aria-hidden
-      viewBox="0 0 20 20"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      className={`h-4 w-4 ${isPending ? "animate-spin" : ""}`}
-    >
-      <title>Refresh</title>
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M16 10a6 6 0 1 1-1.76-4.24"
-      />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M16 4v3.5h-3.5" />
-    </svg>
+      className={`hn hn-refresh text-[14px] leading-none ${isPending ? "animate-spin" : ""}`}
+    />
   );
 }
 
@@ -55,10 +43,10 @@ function getRangeLabel(page: number, size: number, total: number) {
 
 function getPagerButtonStateClass(isEnabled: boolean, isPending: boolean) {
   if (isEnabled && !isPending) {
-    return "border-ctp-surface1 text-ctp-text hover:bg-ctp-surface0";
+    return "border-[var(--pixel-border)] bg-ctp-crust text-ctp-text hover:bg-ctp-surface0";
   }
 
-  return "border-ctp-surface0 text-ctp-overlay0";
+  return "border-ctp-surface0 bg-ctp-mantle text-ctp-overlay0 shadow-none";
 }
 
 export function TableRefreshButton({
@@ -98,7 +86,7 @@ export function TablePager({
   const pageRange = getRangeLabel(page, size, total);
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 border-t border-ctp-surface0 px-4 py-3 text-xs text-ctp-subtext0 sm:px-6">
+    <div className="flex flex-wrap items-center justify-between gap-2 border-t-2 border-[var(--pixel-border)] bg-ctp-base px-4 py-3 text-xs uppercase tracking-[0.04em] text-ctp-subtext0 sm:px-6">
       <p>
         {pageRange} of {total}
       </p>
@@ -111,7 +99,7 @@ export function TablePager({
           className={`${pagerButtonClass} ${getPagerButtonStateClass(canPageBack, isPending)}`}
           aria-label="First page"
         >
-          {"<<"}
+          <i aria-hidden className="hn hn-angle-left-solid text-[14px] leading-none" />
         </button>
 
         <button
@@ -121,10 +109,10 @@ export function TablePager({
           className={`${pagerButtonClass} ${getPagerButtonStateClass(canPageBack, isPending)}`}
           aria-label="Previous page"
         >
-          {"<"}
+          <i aria-hidden className="hn hn-arrow-left-solid text-[14px] leading-none" />
         </button>
 
-        <span className="rounded-md border border-ctp-surface0 px-2.5 py-1 font-medium text-ctp-text">
+        <span className="inline-flex h-8 items-center border border-[var(--pixel-border)] bg-ctp-surface0 px-2.5 font-medium text-ctp-text shadow-[var(--pixel-shadow-sm)]">
           {page} / {totalPages}
         </span>
 
@@ -135,7 +123,7 @@ export function TablePager({
           className={`${pagerButtonClass} ${getPagerButtonStateClass(canPageForward, isPending)}`}
           aria-label="Next page"
         >
-          {">"}
+          <i aria-hidden className="hn hn-arrow-right-solid text-[14px] leading-none" />
         </button>
 
         <button
@@ -145,7 +133,7 @@ export function TablePager({
           className={`${pagerButtonClass} ${getPagerButtonStateClass(canJumpToLast, isPending)}`}
           aria-label="Last page"
         >
-          {">>"}
+          <i aria-hidden className="hn hn-angle-right-solid text-[14px] leading-none" />
         </button>
       </div>
     </div>

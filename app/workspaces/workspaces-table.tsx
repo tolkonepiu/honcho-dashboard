@@ -64,6 +64,7 @@ export function WorkspacesTable({ initialWorkspaces }: WorkspacesTableProps) {
   return (
     <DataSection
       title="Workspaces"
+      titleClassName="text-2xl font-semibold tracking-tight text-ctp-text"
       total={workspaces.total}
       isPending={isPending}
       onRefresh={refreshWorkspaces}

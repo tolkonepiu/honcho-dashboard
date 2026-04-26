@@ -82,7 +82,7 @@ function ConclusionListItem({
   onFilterSession,
 }: ConclusionListItemProps) {
   return (
-    <li className="rounded-xl border border-ctp-surface0 bg-ctp-crust/80 p-4 shadow-sm transition-colors hover:border-ctp-surface1 hover:bg-ctp-crust">
+    <li className="border-2 border-[var(--pixel-border)] bg-ctp-crust p-4 shadow-[var(--pixel-shadow-md)] transition-colors hover:border-ctp-lavender hover:bg-ctp-surface0">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-ctp-subtext0">
           <button
@@ -130,7 +130,7 @@ function ConclusionListItem({
               <span className="font-mono">{conclusion.sessionId}</span>
             </button>
           ) : (
-            <span className="inline-flex items-center gap-1 rounded-md border border-ctp-surface0/70 bg-ctp-base/20 px-2 py-1">
+            <span className="inline-flex items-center gap-1 border border-[var(--pixel-border)] bg-ctp-base px-2 py-1 shadow-[var(--pixel-shadow-sm)]">
               <span className="font-semibold uppercase tracking-[0.1em] text-ctp-subtext1">
                 Session
               </span>
@@ -145,13 +145,13 @@ function ConclusionListItem({
         />
       </div>
 
-      <div className="mt-3 rounded-lg border border-ctp-surface0/80 bg-ctp-base/45 px-3 py-2.5">
+      <div className="mt-3 border-2 border-[var(--pixel-border)] bg-ctp-base px-3 py-2.5 shadow-[var(--pixel-shadow-sm)]">
         <p className="break-words whitespace-pre-wrap text-sm leading-6 text-ctp-text">
           {conclusion.content || "—"}
         </p>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-ctp-surface0 pt-3 text-[11px] text-ctp-subtext0">
+      <div className="mt-3 flex flex-wrap items-center gap-2 border-t-2 border-[var(--pixel-border)] pt-3 text-[11px] text-ctp-subtext0">
         <CopyIdButton
           id={conclusion.id}
           copiedId={copiedId}
@@ -310,7 +310,7 @@ export function ConclusionsPanel({
   return (
     <section className="flex min-h-0 flex-col gap-2 overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-sm font-medium text-ctp-subtext0">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.06em] text-ctp-subtext0">
           Conclusions ({conclusions.total})
         </h2>
 
@@ -323,8 +323,8 @@ export function ConclusionsPanel({
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-ctp-surface0 bg-ctp-mantle shadow-sm">
-        <div className="space-y-3 border-b border-ctp-surface0 p-4 sm:px-6">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-2 border-[var(--pixel-border)] bg-ctp-mantle shadow-[var(--pixel-shadow-md)]">
+        <div className="space-y-3 border-b-2 border-[var(--pixel-border)] p-4 sm:px-6">
           <ConclusionsControls
             peerIds={peerIds}
             sessionIds={sessionIds}

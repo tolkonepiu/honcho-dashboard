@@ -6,9 +6,9 @@ import { HonchoErrorState } from "@/components/ui/honcho-error-state";
 import { PageHeaderActions } from "@/components/ui/page-header-actions";
 import { RelativeTime } from "@/components/ui/relative-time";
 import {
+  type DashboardMessage,
   type DashboardPeer,
   type DashboardSession,
-  type DashboardMessage,
   type PaginatedResult,
   getSession,
   getSessionPeers,
@@ -30,18 +30,18 @@ type StatCardProps = {
 };
 
 function StatCard({ label, value, className, href }: StatCardProps) {
-  const classes = `rounded-xl border border-ctp-surface0 bg-ctp-mantle p-4 shadow-sm${
+  const classes = `border-2 border-[var(--pixel-border)] bg-ctp-mantle p-4 shadow-[var(--pixel-shadow-md)]${
     href
-      ? " transition-colors hover:border-ctp-surface1 hover:bg-ctp-surface0/40"
+      ? " transition-[background-color,border-color,transform] hover:-translate-y-px hover:border-ctp-lavender hover:bg-ctp-surface0"
       : ""
   }${className ? ` ${className}` : ""}`;
 
   const content = (
     <>
-      <dt className="text-xs font-medium uppercase tracking-wide text-ctp-subtext0">
+      <dt className="text-xs font-semibold uppercase tracking-[0.06em] text-ctp-subtext0">
         {label}
       </dt>
-      <dd className="mt-2 text-xl font-semibold tracking-tight text-ctp-text">
+      <dd className="mt-2 text-xl font-semibold text-ctp-text">
         {value}
       </dd>
     </>
