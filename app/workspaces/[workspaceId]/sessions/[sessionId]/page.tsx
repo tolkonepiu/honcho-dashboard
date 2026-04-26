@@ -6,13 +6,13 @@ import { HonchoErrorState } from "@/components/ui/honcho-error-state";
 import { PageHeaderActions } from "@/components/ui/page-header-actions";
 import { RelativeTime } from "@/components/ui/relative-time";
 import {
+  type DashboardMessage,
   type DashboardPeer,
   type DashboardSession,
-  type DashboardMessage,
-  type PaginatedResult,
   getSession,
   getSessionPeers,
   listMessagesPaginated,
+  type PaginatedResult,
 } from "@/lib/honcho";
 import { isHonchoAppError } from "@/lib/honcho-errors";
 import { MessagesSection } from "./messages-section";
@@ -29,21 +29,24 @@ type StatCardProps = {
   href?: string;
 };
 
+type JsonPanelProps = {
+  title: string;
+  value: Record<string, unknown>;
+};
+
 function StatCard({ label, value, className, href }: StatCardProps) {
-  const classes = `rounded-xl border border-ctp-surface0 bg-ctp-mantle p-4 shadow-sm${
+  const classes = `border-2 border-[var(--pixel-border)] bg-ctp-mantle p-4 shadow-[var(--pixel-shadow-md)]${
     href
-      ? " transition-colors hover:border-ctp-surface1 hover:bg-ctp-surface0/40"
+      ? " transition-[background-color,border-color,transform] hover:-translate-y-px hover:border-ctp-lavender hover:bg-ctp-surface0"
       : ""
   }${className ? ` ${className}` : ""}`;
 
   const content = (
     <>
-      <dt className="text-xs font-medium uppercase tracking-wide text-ctp-subtext0">
+      <dt className="text-xs font-semibold uppercase tracking-[0.06em] text-ctp-subtext0">
         {label}
       </dt>
-      <dd className="mt-2 text-xl font-semibold tracking-tight text-ctp-text">
-        {value}
-      </dd>
+      <dd className="mt-2 text-xl font-semibold text-ctp-text">{value}</dd>
     </>
   );
 
@@ -56,6 +59,26 @@ function StatCard({ label, value, className, href }: StatCardProps) {
   }
 
   return <div className={classes}>{content}</div>;
+}
+
+function JsonPanel({ title, value }: JsonPanelProps) {
+  if (Object.keys(value).length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="space-y-3">
+      <h2 className="text-xs font-semibold uppercase tracking-[0.06em] text-ctp-subtext0">
+        {title}
+      </h2>
+
+      <div className="overflow-hidden border-2 border-[var(--pixel-border)] bg-ctp-mantle shadow-[var(--pixel-shadow-md)]">
+        <pre className="overflow-x-auto whitespace-pre-wrap break-words p-4 font-mono text-xs leading-5 text-ctp-subtext1 sm:px-6">
+          {JSON.stringify(value, null, 2)}
+        </pre>
+      </div>
+    </section>
+  );
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -130,24 +153,23 @@ export default async function SessionDetailPage({ params }: Props) {
         <StatCard label="Workspace" value={workspaceId} href={wsBase} />
         <StatCard
           label="Status"
-          value={session.isActive ? "Active" : "Inactive"}
+          value={
+            <span
+              className={`inline-flex whitespace-nowrap border px-2 py-0.5 text-xs font-semibold uppercase tracking-[0.04em] shadow-[var(--pixel-shadow-sm)] ${
+                session.isActive
+                  ? "border-ctp-green/70 bg-ctp-green/20 text-ctp-green"
+                  : "border-[var(--pixel-border)] bg-ctp-crust text-ctp-subtext0"
+              }`}
+            >
+              {session.isActive ? "Active" : "Inactive"}
+            </span>
+          }
         />
         <StatCard
           label="Messages"
           value={initialMessages.total.toLocaleString()}
         />
         <StatCard label="Peers" value={initialPeers.length.toLocaleString()} />
-        {session.metadata && Object.keys(session.metadata).length > 0 ? (
-          <StatCard
-            label="Metadata"
-            className="sm:col-span-2 xl:col-span-4"
-            value={
-              <span className="block whitespace-pre-wrap font-mono text-xs font-normal leading-5 text-ctp-subtext1">
-                {JSON.stringify(session.metadata, null, 2)}
-              </span>
-            }
-          />
-        ) : null}
       </dl>
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -166,6 +188,8 @@ export default async function SessionDetailPage({ params }: Props) {
             sessionId={sessionId}
             initialPeers={initialPeers}
           />
+          <JsonPanel title="Metadata" value={session.metadata} />
+          <JsonPanel title="Configuration" value={session.configuration} />
         </div>
       </div>
     </div>

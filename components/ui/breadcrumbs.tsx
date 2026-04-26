@@ -24,19 +24,20 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
       aria-label="Breadcrumb"
       className={buildClassName("min-w-0", className)}
     >
-      <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-ctp-subtext0">
+      <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs uppercase tracking-[0.05em] text-ctp-subtext0">
         {items.map((item, index) => {
           const isCurrent = index === items.length - 1;
 
           return (
             <li
               key={item.href ? `${item.href}-${item.label}` : item.label}
-              className="flex min-w-0 items-center gap-2"
+              className="flex min-w-0 items-center gap-1.5"
             >
               {index > 0 ? (
-                <span aria-hidden className="text-ctp-overlay0">
-                  &gt;
-                </span>
+                <i
+                  aria-hidden
+                  className="hn hn-angle-right-solid text-[14px] leading-none text-ctp-overlay0"
+                />
               ) : null}
 
               {item.href ? (
@@ -44,14 +45,16 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
                   href={item.href}
                   aria-current={isCurrent ? "page" : undefined}
                   className={buildClassName(
-                    "truncate transition-colors hover:text-ctp-text",
-                    isCurrent ? "font-medium text-ctp-text" : undefined,
+                    "truncate border border-transparent px-1.5 py-0.5 transition-colors hover:border-[var(--pixel-border)] hover:bg-ctp-surface0 hover:text-ctp-text",
+                    isCurrent
+                      ? "border-[var(--pixel-border)] bg-ctp-surface0 font-medium text-ctp-text shadow-[var(--pixel-shadow-sm)]"
+                      : undefined,
                   )}
                 >
                   {item.label}
                 </Link>
               ) : (
-                <span className="truncate font-medium text-ctp-text">
+                <span className="truncate border border-[var(--pixel-border)] bg-ctp-surface0 px-1.5 py-0.5 font-medium text-ctp-text shadow-[var(--pixel-shadow-sm)]">
                   {item.label}
                 </span>
               )}

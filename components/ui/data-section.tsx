@@ -4,6 +4,7 @@ import { TableRefreshButton } from "@/components/ui/table-controls";
 
 type DataSectionProps = {
   title: string;
+  titleClassName?: string;
   total: number;
   isPending: boolean;
   onRefresh: () => void;
@@ -16,6 +17,7 @@ type DataSectionProps = {
 
 export function DataSection({
   title,
+  titleClassName,
   total,
   isPending,
   onRefresh,
@@ -25,10 +27,14 @@ export function DataSection({
   error,
   children,
 }: DataSectionProps) {
+  const resolvedTitleClassName =
+    titleClassName ??
+    "text-xs font-semibold uppercase tracking-[0.06em] text-ctp-subtext0";
+
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-sm font-medium text-ctp-subtext0">
+        <h2 className={resolvedTitleClassName}>
           {title} ({total})
         </h2>
 
@@ -42,7 +48,7 @@ export function DataSection({
       {total === 0 ? (
         <EmptyState title={emptyTitle} description={emptyDescription} />
       ) : (
-        <div className="overflow-hidden rounded-xl border border-ctp-surface0 bg-ctp-mantle shadow-sm">
+        <div className="overflow-hidden border-2 border-[var(--pixel-border)] bg-ctp-mantle shadow-[var(--pixel-shadow-md)]">
           {children}
         </div>
       )}

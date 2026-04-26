@@ -8,10 +8,10 @@ import { RelativeTime } from "@/components/ui/relative-time";
 import {
   type DashboardPeer,
   type DashboardSession,
-  type PaginatedResult,
   getPeer,
   getPeerCard,
   listPeerSessionsPaginated,
+  type PaginatedResult,
 } from "@/lib/honcho";
 import { isHonchoAppError } from "@/lib/honcho-errors";
 import { SessionsSection } from "../../sessions-section";
@@ -26,21 +26,24 @@ type StatCardProps = {
   href?: string;
 };
 
+type JsonPanelProps = {
+  title: string;
+  value: Record<string, unknown>;
+};
+
 function StatCard({ label, value, className, href }: StatCardProps) {
-  const classes = `rounded-xl border border-ctp-surface0 bg-ctp-mantle p-4 shadow-sm${
+  const classes = `border-2 border-[var(--pixel-border)] bg-ctp-mantle p-4 shadow-[var(--pixel-shadow-md)]${
     href
-      ? " transition-colors hover:border-ctp-surface1 hover:bg-ctp-surface0/40"
+      ? " transition-[background-color,border-color,transform] hover:-translate-y-px hover:border-ctp-lavender hover:bg-ctp-surface0"
       : ""
   }${className ? ` ${className}` : ""}`;
 
   const content = (
     <>
-      <dt className="text-xs font-medium uppercase tracking-wide text-ctp-subtext0">
+      <dt className="text-xs font-semibold uppercase tracking-[0.06em] text-ctp-subtext0">
         {label}
       </dt>
-      <dd className="mt-2 text-xl font-semibold tracking-tight text-ctp-text">
-        {value}
-      </dd>
+      <dd className="mt-2 text-xl font-semibold text-ctp-text">{value}</dd>
     </>
   );
 
@@ -53,6 +56,26 @@ function StatCard({ label, value, className, href }: StatCardProps) {
   }
 
   return <div className={classes}>{content}</div>;
+}
+
+function JsonPanel({ title, value }: JsonPanelProps) {
+  if (Object.keys(value).length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="space-y-3">
+      <h2 className="text-xs font-semibold uppercase tracking-[0.06em] text-ctp-subtext0">
+        {title}
+      </h2>
+
+      <div className="overflow-hidden border-2 border-[var(--pixel-border)] bg-ctp-mantle shadow-[var(--pixel-shadow-md)]">
+        <pre className="overflow-x-auto whitespace-pre-wrap break-words p-4 font-mono text-xs leading-5 text-ctp-subtext1 sm:px-6">
+          {JSON.stringify(value, null, 2)}
+        </pre>
+      </div>
+    </section>
+  );
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -119,17 +142,6 @@ export default async function PeerDetailPage({ params }: Props) {
           label="Card Entries"
           value={(peerCard?.length ?? 0).toLocaleString()}
         />
-        {peer.metadata && Object.keys(peer.metadata).length > 0 ? (
-          <StatCard
-            label="Metadata"
-            className="sm:col-span-2 xl:col-span-3"
-            value={
-              <span className="block whitespace-pre-wrap font-mono text-xs font-normal leading-5 text-ctp-subtext1">
-                {JSON.stringify(peer.metadata, null, 2)}
-              </span>
-            }
-          />
-        ) : null}
       </dl>
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -151,6 +163,8 @@ export default async function PeerDetailPage({ params }: Props) {
             emptyStateTitle="No sessions"
             emptyStateDescription="This peer has no sessions yet."
           />
+          <JsonPanel title="Metadata" value={peer.metadata} />
+          <JsonPanel title="Configuration" value={peer.configuration} />
         </div>
       </div>
     </div>

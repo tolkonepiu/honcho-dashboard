@@ -12,7 +12,7 @@ export function CopyFeedback({ isCopied }: { isCopied: boolean }) {
   }
 
   return (
-    <span className="rounded-md border border-ctp-green/40 bg-ctp-green/15 px-2 py-1 font-medium text-ctp-green">
+    <span className="inline-flex items-center border border-ctp-green bg-ctp-green/20 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-ctp-green shadow-[var(--pixel-shadow-sm)]">
       Copied
     </span>
   );

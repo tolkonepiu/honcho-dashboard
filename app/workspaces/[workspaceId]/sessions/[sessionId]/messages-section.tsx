@@ -48,11 +48,6 @@ function ensureCurrentOption(options: string[], currentValue?: string) {
   return [currentValue, ...options];
 }
 
-function getPeerInitial(peerId: string) {
-  const [firstToken] = peerId.trim().split(/\s+/);
-  return (firstToken?.[0] ?? "?").toUpperCase();
-}
-
 function buildPeerDirectionMap(
   messages: MessageItem[],
   peerIds: string[],
@@ -101,67 +96,56 @@ function MessageListItem({
     <li className={`flex ${isRight ? "justify-end" : "justify-start"}`}>
       <article className="w-full max-w-4xl">
         <div
-          className={`flex items-start gap-2 ${isRight ? "flex-row-reverse" : ""}`}
+          className={`flex min-w-0 flex-1 flex-col space-y-2 ${isRight ? "items-end" : "items-start"}`}
         >
-          <span
-            aria-hidden
-            className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-ctp-surface1 bg-ctp-base text-[11px] font-semibold text-ctp-subtext1"
+          <div
+            className={`flex w-full flex-wrap items-center gap-x-2 gap-y-1 ${isRight ? "justify-end" : "justify-start"}`}
           >
-            {getPeerInitial(message.peerId)}
-          </span>
+            <button
+              type="button"
+              onClick={() => {
+                onFilterPeer(message.peerId);
+              }}
+              className="inline-flex items-center px-0 py-0 text-left text-[11px] font-semibold uppercase tracking-[0.05em] text-ctp-subtext0 transition-colors hover:text-ctp-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle"
+            >
+              {message.peerId}
+            </button>
+
+            <RelativeTime
+              value={message.createdAt}
+              className="text-xs text-ctp-subtext0"
+            />
+          </div>
 
           <div
-            className={`flex min-w-0 flex-1 flex-col space-y-2 ${isRight ? "items-end" : "items-start"}`}
+            className={`w-full max-w-3xl border-2 px-4 py-3 shadow-[var(--pixel-shadow-sm)] ${
+              isRight
+                ? "border-ctp-surface1 bg-ctp-surface0"
+                : "border-[var(--pixel-border)] bg-ctp-crust"
+            }`}
           >
-            <div
-              className={`flex w-full flex-wrap items-center gap-x-2 gap-y-1 ${isRight ? "justify-end" : "justify-start"}`}
-            >
-              <button
-                type="button"
-                onClick={() => {
-                  onFilterPeer(message.peerId);
-                }}
-                className="rounded-sm text-sm font-semibold text-ctp-text transition-colors hover:text-ctp-lavender hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ctp-lavender/70 focus-visible:ring-offset-1 focus-visible:ring-offset-ctp-mantle"
-              >
-                {message.peerId}
-              </button>
+            <p className="break-words whitespace-pre-wrap text-sm leading-6 text-ctp-text">
+              {message.content || "—"}
+            </p>
+          </div>
 
-              <RelativeTime
-                value={message.createdAt}
-                className="text-xs text-ctp-subtext0"
-              />
-            </div>
+          <div
+            className={`flex w-full max-w-3xl flex-wrap items-center gap-2 text-[11px] text-ctp-subtext0 ${
+              isRight ? "justify-end" : "justify-start"
+            }`}
+          >
+            <CopyIdButton
+              id={message.id}
+              copiedId={copiedId}
+              onCopy={onCopyId}
+            />
 
-            <div
-              className={`w-full max-w-3xl rounded-2xl border px-4 py-3 shadow-sm ${
-                isRight
-                  ? "rounded-tr-sm border-ctp-surface1 bg-ctp-surface0/50"
-                  : "rounded-tl-sm border-ctp-surface0 bg-ctp-crust/90"
-              }`}
-            >
-              <p className="break-words whitespace-pre-wrap text-sm leading-6 text-ctp-text">
-                {message.content || "—"}
-              </p>
-            </div>
-
-            <div
-              className={`flex w-full max-w-3xl flex-wrap items-center gap-2 text-[11px] text-ctp-subtext0 ${
-                isRight ? "justify-end" : "justify-start"
-              }`}
-            >
-              <CopyIdButton
-                id={message.id}
-                copiedId={copiedId}
-                onCopy={onCopyId}
-              />
-
-              <span className="inline-flex items-center gap-1 rounded-md border border-ctp-surface0/70 px-2 py-1">
-                <span className="font-medium text-ctp-subtext1">Tokens</span>
-                <span className="font-mono text-ctp-subtext0">
-                  {message.tokenCount}
-                </span>
+            <span className="inline-flex items-center gap-1 border border-[var(--pixel-border)] bg-ctp-base px-2 py-1 shadow-[var(--pixel-shadow-sm)]">
+              <span className="font-medium text-ctp-subtext1">Tokens</span>
+              <span className="font-mono text-ctp-subtext0">
+                {message.tokenCount}
               </span>
-            </div>
+            </span>
           </div>
         </div>
       </article>
@@ -304,7 +288,7 @@ export function MessagesSection({
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-sm font-medium text-ctp-subtext0">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.06em] text-ctp-subtext0">
           Messages ({messages.total})
         </h2>
 
@@ -315,8 +299,8 @@ export function MessagesSection({
         />
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-ctp-surface0 bg-ctp-mantle shadow-sm">
-        <div className="space-y-3 border-b border-ctp-surface0 p-4 sm:px-6">
+      <div className="overflow-hidden border-2 border-[var(--pixel-border)] bg-ctp-mantle shadow-[var(--pixel-shadow-md)]">
+        <div className="space-y-3 border-b-2 border-[var(--pixel-border)] p-4 sm:px-6">
           <div aria-busy={isPending} className="grid gap-3 sm:grid-cols-2">
             <SelectField
               label="Peer filter"

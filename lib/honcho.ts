@@ -704,9 +704,7 @@ export async function getWorkspaceStats(
 
 export async function deleteWorkspace(workspaceId: string): Promise<void> {
   const client = createClient();
-  await runHonchoRequest(() =>
-    client.http.delete(workspacePath(workspaceId)),
-  );
+  await runHonchoRequest(() => client.http.delete(workspacePath(workspaceId)));
 }
 
 export async function deleteSession(

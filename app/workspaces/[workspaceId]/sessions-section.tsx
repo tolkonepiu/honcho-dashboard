@@ -32,6 +32,7 @@ type SessionsSectionProps = {
   sessionsApiPath?: string;
   sessionsBasePath?: string;
   title?: string;
+  titleClassName?: string;
   emptyStateTitle?: string;
   emptyStateDescription?: string;
   showMetadataColumns?: boolean;
@@ -43,6 +44,7 @@ export function SessionsSection({
   sessionsApiPath,
   sessionsBasePath,
   title,
+  titleClassName,
   emptyStateTitle,
   emptyStateDescription,
   showMetadataColumns,
@@ -90,6 +92,7 @@ export function SessionsSection({
   return (
     <DataSection
       title={sectionTitle}
+      titleClassName={titleClassName}
       total={sessions.total}
       isPending={isPending}
       onRefresh={refreshSessions}
@@ -100,7 +103,7 @@ export function SessionsSection({
     >
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
-          <thead className="bg-ctp-crust/90 text-xs uppercase tracking-wide text-ctp-subtext0">
+          <thead className="bg-ctp-crust text-xs uppercase tracking-[0.05em] text-ctp-subtext0">
             <tr>
               <th scope="col" className="px-4 py-3 font-medium sm:px-6">
                 Session ID
@@ -132,23 +135,23 @@ export function SessionsSection({
                 <ClickableTableRow
                   href={href}
                   key={session.id}
-                  className="group"
+                  className="group hover:bg-transparent"
                 >
                   <td className="px-4 py-3 font-medium text-ctp-text sm:px-6">
                     <Link
                       href={href}
                       title={session.id}
-                      className="block whitespace-normal break-words truncate rounded-sm underline-offset-2 transition-colors group-hover:text-ctp-lavender hover:underline"
+                      className="block whitespace-normal break-words truncate underline-offset-2 transition-colors group-hover:text-ctp-lavender hover:underline"
                     >
                       {session.id}
                     </Link>
                   </td>
                   <td className="px-4 py-3 sm:px-6">
                     <span
-                      className={`inline-flex whitespace-nowrap rounded-full border px-2 py-0.5 text-xs font-medium ${
+                      className={`inline-flex whitespace-nowrap border px-2 py-0.5 text-xs font-semibold uppercase tracking-[0.04em] shadow-[var(--pixel-shadow-sm)] ${
                         session.isActive
-                          ? "border-ctp-green/60 bg-ctp-green/15 text-ctp-green"
-                          : "border-ctp-surface1 bg-ctp-surface0 text-ctp-subtext0"
+                          ? "border-ctp-green/70 bg-ctp-green/20 text-ctp-green"
+                          : "border-[var(--pixel-border)] bg-ctp-crust text-ctp-subtext0"
                       }`}
                     >
                       {session.isActive ? "Active" : "Inactive"}

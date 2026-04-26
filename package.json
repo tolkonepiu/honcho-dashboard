@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@hackernoon/pixel-icon-library": "1.1.0",
     "@honcho-ai/sdk": "2.1.1",
     "date-fns": "4.1.0",
     "next": "16.2.4",

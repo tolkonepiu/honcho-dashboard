@@ -22,23 +22,23 @@ export function EmptyState({
   return (
     <section
       className={buildClassName(
-        "rounded-xl border border-dashed border-ctp-surface1 bg-ctp-mantle/70 px-6 py-10 text-center",
+        "border-2 border-[var(--pixel-border)] bg-ctp-mantle px-5 py-8 text-center shadow-[var(--pixel-shadow-md)]",
         className,
       )}
     >
       <div className="mx-auto flex max-w-md flex-col items-center gap-3">
         {icon ? (
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-ctp-surface1 bg-ctp-crust text-ctp-subtext0">
+          <div className="flex h-10 w-10 items-center justify-center border-2 border-[var(--pixel-border)] bg-ctp-crust text-ctp-subtext0 shadow-[var(--pixel-shadow-sm)]">
             {icon}
           </div>
         ) : null}
 
-        <h2 className="text-lg font-semibold tracking-tight text-ctp-text">
+        <h2 className="text-sm font-semibold uppercase tracking-[0.06em] text-ctp-text">
           {title}
         </h2>
 
         {description ? (
-          <p className="text-sm text-ctp-subtext0">{description}</p>
+          <p className="text-xs leading-5 text-ctp-subtext0">{description}</p>
         ) : null}
 
         {action ? <div className="pt-2">{action}</div> : null}
