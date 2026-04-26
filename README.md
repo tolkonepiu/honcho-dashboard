@@ -21,7 +21,10 @@
 Run the dashboard with Docker:
 
 ```bash
-docker run -e HONCHO_BASE_URL=http://localhost:8000 -p 3000:3000 ghcr.io/tolkonepiu/honcho-dashboard:latest
+docker run \
+  -p 3000:3000 \
+  -e HONCHO_BASE_URL=http://localhost:8000 \
+  ghcr.io/tolkonepiu/honcho-dashboard:latest
 ```
 
 Available environment variables:
@@ -33,7 +36,11 @@ Available environment variables:
 If your instance requires authentication:
 
 ```bash
-docker run -e HONCHO_BASE_URL=http://localhost:8000 -e HONCHO_API_KEY=your-api-key -p 3000:3000 ghcr.io/tolkonepiu/honcho-dashboard:latest
+docker run \
+  -p 3000:3000 \
+  -e HONCHO_BASE_URL=http://localhost:8000 \
+  -e HONCHO_API_KEY=your-api-key \
+  ghcr.io/tolkonepiu/honcho-dashboard:latest
 ```
 
 Then open [http://localhost:3000](http://localhost:3000).
