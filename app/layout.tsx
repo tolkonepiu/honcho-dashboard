@@ -1,7 +1,7 @@
+import "./globals.css";
+import "@hackernoon/pixel-icon-library/fonts/iconfont.css";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import "@hackernoon/pixel-icon-library/fonts/iconfont.css";
-import "./globals.css";
 
 const departureMono = localFont({
   src: "./fonts/DepartureMono-Regular.woff2",
@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${departureMono.variable} h-full`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
 }

@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { useCallback, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { ClickableTableRow } from "@/components/ui/clickable-table-row";
 import { DataSection } from "@/components/ui/data-section";
@@ -10,6 +8,8 @@ import { RelativeTime } from "@/components/ui/relative-time";
 import { TablePager } from "@/components/ui/table-controls";
 import { usePaginatedFetch } from "@/hooks/use-paginated-fetch";
 import { usePagination } from "@/hooks/use-pagination";
+import Link from "next/link";
+import { useCallback, useState } from "react";
 
 type SessionRow = {
   id: string;
@@ -142,7 +142,7 @@ export function SessionsSection({
                     <Link
                       href={href}
                       title={session.id}
-                        className="block whitespace-normal break-words truncate underline-offset-2 transition-colors group-hover:text-[var(--color-accent)] hover:underline"
+                      className="block truncate break-words whitespace-normal underline-offset-2 transition-colors group-hover:text-[var(--color-accent)] hover:underline"
                     >
                       {session.id}
                     </Link>

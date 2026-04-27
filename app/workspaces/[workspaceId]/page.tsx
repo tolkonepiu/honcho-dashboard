@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { ConclusionsPanel } from "./conclusions-panel";
+import { PeersSection } from "./peers-section";
+import { SessionsSection } from "./sessions-section";
 import { HonchoErrorState } from "@/components/ui/honcho-error-state";
 import { JsonPanel } from "@/components/ui/json-panel";
 import { PageHeaderActions } from "@/components/ui/page-header-actions";
@@ -22,9 +23,8 @@ import {
   type WorkspaceStats,
 } from "@/lib/honcho";
 import { isHonchoAppError } from "@/lib/honcho-errors";
-import { ConclusionsPanel } from "./conclusions-panel";
-import { PeersSection } from "./peers-section";
-import { SessionsSection } from "./sessions-section";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 type SearchParams = Promise<{
   page?: string | string[];
@@ -136,7 +136,7 @@ export default async function WorkspaceDetailPage({
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 space-y-1">
-          <h1 className="text-2xl font-semibold uppercase tracking-[0.05em] text-[var(--text-primary)]">
+          <h1 className="text-2xl font-semibold tracking-[0.05em] text-[var(--text-primary)] uppercase">
             {workspaceId}
           </h1>
           <p className="text-sm text-[var(--text-muted)]">

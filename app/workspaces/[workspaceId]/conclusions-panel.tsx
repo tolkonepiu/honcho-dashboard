@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { ConclusionsControls, type QueryUpdates } from "./conclusions-controls";
 import { Badge } from "@/components/ui/badge";
 import { metadataButtonClass } from "@/components/ui/button-styles";
 import { CopyIdButton } from "@/components/ui/copy-id-button";
@@ -12,7 +12,7 @@ import { useClipboard } from "@/hooks/use-clipboard";
 import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
 import { usePagination } from "@/hooks/use-pagination";
 import { getApiErrorMessage } from "@/lib/api-client";
-import { ConclusionsControls, type QueryUpdates } from "./conclusions-controls";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type ConclusionItem = {
   id: string;
@@ -88,8 +88,8 @@ function ConclusionListItem({
   onDelete,
   onFilterObserver,
   onFilterObserved,
-    onFilterSession,
-  }: ConclusionListItemProps) {
+  onFilterSession,
+}: ConclusionListItemProps) {
   return (
     <Surface as="li" variant="subtle" className="p-4 transition-colors">
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -101,9 +101,7 @@ function ConclusionListItem({
             }}
             className={metadataButtonClass}
           >
-            <span className="ui-compact-kicker">
-              Observer
-            </span>
+            <span className="ui-compact-kicker">Observer</span>
             <span className="font-mono">{conclusion.observerId}</span>
           </button>
 
@@ -114,9 +112,7 @@ function ConclusionListItem({
             }}
             className={metadataButtonClass}
           >
-            <span className="ui-compact-kicker">
-              Observed
-            </span>
+            <span className="ui-compact-kicker">Observed</span>
             <span className="font-mono">{conclusion.observedId}</span>
           </button>
 
@@ -133,16 +129,12 @@ function ConclusionListItem({
               }}
               className={metadataButtonClass}
             >
-              <span className="ui-compact-kicker">
-                Session
-              </span>
+              <span className="ui-compact-kicker">Session</span>
               <span className="font-mono">{conclusion.sessionId}</span>
             </button>
           ) : (
             <Badge>
-              <span className="ui-compact-kicker">
-                Session
-              </span>
+              <span className="ui-compact-kicker">Session</span>
               <span className="font-mono">—</span>
             </Badge>
           )}
@@ -154,8 +146,11 @@ function ConclusionListItem({
         />
       </div>
 
-      <Surface variant="inset" className="mt-3 min-w-0 max-w-full overflow-hidden px-3 py-2.5">
-        <p className="min-w-0 max-w-full whitespace-pre-wrap break-words [overflow-wrap:anywhere] text-sm leading-6 text-[var(--text-primary)]">
+      <Surface
+        variant="inset"
+        className="mt-3 max-w-full min-w-0 overflow-hidden px-3 py-2.5"
+      >
+        <p className="max-w-full min-w-0 text-sm leading-6 [overflow-wrap:anywhere] break-words whitespace-pre-wrap text-[var(--text-primary)]">
           {conclusion.content || "—"}
         </p>
       </Surface>
@@ -378,9 +373,7 @@ export function ConclusionsPanel({
   return (
     <section className="flex min-h-0 flex-col gap-2 overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="ui-section-label">
-          Conclusions ({conclusions.total})
-        </h2>
+        <h2 className="ui-section-label">Conclusions ({conclusions.total})</h2>
 
         <div className="flex items-center gap-2">
           <TableRefreshButton
@@ -448,7 +441,9 @@ export function ConclusionsPanel({
         />
       </Surface>
 
-      {error ? <p className="text-xs text-[var(--color-danger)]">{error}</p> : null}
+      {error ? (
+        <p className="text-xs text-[var(--color-danger)]">{error}</p>
+      ) : null}
     </section>
   );
 }

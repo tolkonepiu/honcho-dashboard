@@ -1,6 +1,5 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { CopyIdButton } from "@/components/ui/copy-id-button";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -12,6 +11,7 @@ import { useClipboard } from "@/hooks/use-clipboard";
 import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
 import { usePagination } from "@/hooks/use-pagination";
 import { getApiErrorMessage } from "@/lib/api-client";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type MessageItem = {
   id: string;
@@ -108,7 +108,7 @@ function MessageListItem({
               onClick={() => {
                 onFilterPeer(message.peerId);
               }}
-              className="ui-compact-label ui-compact-text inline-flex items-center px-0 py-0 text-left text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_srgb,var(--color-accent)_70%,transparent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--surface-elevated)]"
+              className="ui-compact-label ui-compact-text inline-flex items-center px-0 py-0 text-left text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)] focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_srgb,var(--color-accent)_70%,transparent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--surface-elevated)] focus-visible:outline-none"
             >
               {message.peerId}
             </button>
@@ -123,7 +123,7 @@ function MessageListItem({
             variant={isRight ? "inset" : "subtle"}
             className="w-full max-w-3xl px-4 py-3"
           >
-            <p className="break-words whitespace-pre-wrap text-sm leading-6 text-[var(--text-primary)]">
+            <p className="text-sm leading-6 break-words whitespace-pre-wrap text-[var(--text-primary)]">
               {message.content || "—"}
             </p>
           </Surface>
@@ -287,9 +287,7 @@ export function MessagesSection({
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="ui-section-label">
-          Messages ({messages.total})
-        </h2>
+        <h2 className="ui-section-label">Messages ({messages.total})</h2>
 
         <TableRefreshButton
           isPending={isPending}
@@ -379,7 +377,9 @@ export function MessagesSection({
         />
       </Surface>
 
-      {error ? <p className="text-xs text-[var(--color-danger)]">{error}</p> : null}
+      {error ? (
+        <p className="text-xs text-[var(--color-danger)]">{error}</p>
+      ) : null}
     </section>
   );
 }

@@ -88,7 +88,7 @@ export function TablePager({
   const pageRange = getRangeLabel(page, size, total);
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 border-t-2 border-[var(--pixel-border)] bg-[var(--surface-base)] px-4 py-3 text-xs uppercase tracking-[0.04em] text-[var(--text-muted)] sm:px-6">
+    <div className="flex flex-wrap items-center justify-between gap-2 border-t-2 border-[var(--pixel-border)] bg-[var(--surface-base)] px-4 py-3 text-xs tracking-[0.04em] text-[var(--text-muted)] uppercase sm:px-6">
       <p>
         {pageRange} of {total}
       </p>
@@ -101,10 +101,7 @@ export function TablePager({
           className={`${pagerButtonClass} ${getPagerButtonStateClass(canPageBack, isPending)}`}
           aria-label="First page"
         >
-          <i
-            aria-hidden
-            className="hn hn-angle-left-solid ui-icon-sm"
-          />
+          <i aria-hidden className="hn hn-angle-left-solid ui-icon-sm" />
         </button>
 
         <button
@@ -114,10 +111,7 @@ export function TablePager({
           className={`${pagerButtonClass} ${getPagerButtonStateClass(canPageBack, isPending)}`}
           aria-label="Previous page"
         >
-          <i
-            aria-hidden
-            className="hn hn-arrow-left-solid ui-icon-sm"
-          />
+          <i aria-hidden className="hn hn-arrow-left-solid ui-icon-sm" />
         </button>
 
         <span className="inline-flex h-8 items-center border border-[var(--pixel-border)] bg-[var(--surface-interactive)] px-2.5 font-medium text-[var(--text-primary)] shadow-[var(--pixel-shadow-sm)]">
@@ -131,10 +125,7 @@ export function TablePager({
           className={`${pagerButtonClass} ${getPagerButtonStateClass(canPageForward, isPending)}`}
           aria-label="Next page"
         >
-          <i
-            aria-hidden
-            className="hn hn-arrow-right-solid ui-icon-sm"
-          />
+          <i aria-hidden className="hn hn-arrow-right-solid ui-icon-sm" />
         </button>
 
         <button
@@ -144,10 +135,7 @@ export function TablePager({
           className={`${pagerButtonClass} ${getPagerButtonStateClass(canJumpToLast, isPending)}`}
           aria-label="Last page"
         >
-          <i
-            aria-hidden
-            className="hn hn-angle-right-solid ui-icon-sm"
-          />
+          <i aria-hidden className="hn hn-angle-right-solid ui-icon-sm" />
         </button>
       </div>
     </div>

@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
 import { ClickableTableRow } from "@/components/ui/clickable-table-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { RelativeTime } from "@/components/ui/relative-time";
@@ -9,6 +7,8 @@ import { Surface } from "@/components/ui/surface";
 import { TablePager, TableRefreshButton } from "@/components/ui/table-controls";
 import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
 import { getApiErrorMessage } from "@/lib/api-client";
+import Link from "next/link";
+import { useCallback, useMemo, useState } from "react";
 
 type SessionPeer = {
   id: string;
@@ -94,9 +94,7 @@ export function SessionPeersSection({
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="ui-section-label">
-          Peers ({peers.length})
-        </h2>
+        <h2 className="ui-section-label">Peers ({peers.length})</h2>
 
         <TableRefreshButton
           isPending={isPending}
@@ -169,7 +167,9 @@ export function SessionPeersSection({
         </Surface>
       )}
 
-      {error ? <p className="text-xs text-[var(--color-danger)]">{error}</p> : null}
+      {error ? (
+        <p className="text-xs text-[var(--color-danger)]">{error}</p>
+      ) : null}
     </section>
   );
 }

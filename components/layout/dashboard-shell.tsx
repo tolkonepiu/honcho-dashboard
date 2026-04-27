@@ -1,10 +1,10 @@
 "use client";
 
+import type { BreadcrumbItem } from "@/components/ui/breadcrumbs";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import type { BreadcrumbItem } from "@/components/ui/breadcrumbs";
-import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 
 type DashboardShellProps = {
   children: ReactNode;
@@ -38,7 +38,7 @@ export function DashboardShell({
           <div className="flex h-14 items-center gap-4">
             <Link
               href="/workspaces"
-              className="inline-flex min-w-0 items-center gap-2 border border-transparent px-1.5 py-1 text-xs font-bold uppercase tracking-[0.08em] text-[var(--text-primary)] transition-colors hover:border-[var(--pixel-border)] hover:bg-[var(--surface-interactive)] hover:text-[var(--color-accent)]"
+              className="inline-flex min-w-0 items-center gap-2 border border-transparent px-1.5 py-1 text-xs font-bold tracking-[0.08em] text-[var(--text-primary)] uppercase transition-colors hover:border-[var(--pixel-border)] hover:bg-[var(--surface-interactive)] hover:text-[var(--color-accent)]"
             >
               <i
                 aria-hidden

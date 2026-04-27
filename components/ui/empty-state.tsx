@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
-import { cn } from "@/lib/cn";
 import { Surface } from "@/components/ui/surface";
+import { cn } from "@/lib/cn";
+import type { ReactNode } from "react";
 
 type EmptyStateProps = {
   title: string;
@@ -18,10 +18,7 @@ export function EmptyState({
   className,
 }: EmptyStateProps) {
   return (
-    <Surface
-      as="section"
-      className={cn("px-5 py-8 text-center", className)}
-    >
+    <Surface as="section" className={cn("px-5 py-8 text-center", className)}>
       <div className="mx-auto flex max-w-md flex-col items-center gap-3">
         {icon ? (
           <div className="ui-surface-subtle flex h-10 w-10 items-center justify-center text-[var(--text-muted)]">
@@ -29,9 +26,7 @@ export function EmptyState({
           </div>
         ) : null}
 
-        <h2 className="ui-title">
-          {title}
-        </h2>
+        <h2 className="ui-title">{title}</h2>
 
         {description ? (
           <p className="text-xs leading-5 text-[var(--text-muted)]">

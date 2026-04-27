@@ -1,5 +1,4 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { PeersSection } from "../peers-section";
 import { HonchoErrorState } from "@/components/ui/honcho-error-state";
 import {
   type DashboardPeer,
@@ -9,7 +8,8 @@ import {
   listPeersPaginated,
 } from "@/lib/honcho";
 import { isHonchoAppError } from "@/lib/honcho-errors";
-import { PeersSection } from "../peers-section";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 type Props = { params: Promise<{ workspaceId: string }> };
 

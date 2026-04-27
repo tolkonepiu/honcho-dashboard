@@ -1,38 +1,30 @@
 {
-  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
-  extends: [
-    'config:best-practices',
-    ':pinVersions',
-  ],
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:best-practices", ":pinVersions"],
   dependencyDashboard: false,
   customManagers: [
     {
-      customType: 'regex',
-      managerFilePatterns: [
-        '/.+\\.ya?ml$/',
-      ],
+      customType: "regex",
+      managerFilePatterns: ["/.+\\.ya?ml$/"],
       matchStrings: [
-        '# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\n.*?: (?<currentValue>.*)',
+        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\n.*?: (?<currentValue>.*)",
       ],
-      versioningTemplate: '{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}',
-      extractVersionTemplate: '^(v)?(?<version>.*)$',
+      versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
+      extractVersionTemplate: "^(v)?(?<version>.*)$",
     },
   ],
   packageRules: [
     {
-      matchManagers: [
-        'bun',
-        'dockerfile'
-      ],
-      bumpVersion: 'patch',
+      matchManagers: ["bun", "dockerfile"],
+      bumpVersion: "patch",
     },
     {
       matchUpdateTypes: [
-        'minor',
-        'patch',
-        'pin',
-        'digest',
-        'lockFileMaintenance',
+        "minor",
+        "patch",
+        "pin",
+        "digest",
+        "lockFileMaintenance",
       ],
       automerge: true,
     },

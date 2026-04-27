@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
 import { SelectField } from "@/components/ui/select-field";
+import { useMemo } from "react";
 
 type ConclusionsControlsProps = {
   peerIds: string[];

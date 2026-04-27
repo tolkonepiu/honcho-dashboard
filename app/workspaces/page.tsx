@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
+import { WorkspacesTable } from "./workspaces-table";
+import { HonchoErrorState } from "@/components/ui/honcho-error-state";
 import {
   type DashboardWorkspaceTableRow,
   type PaginatedResult,
   listWorkspaceTableRowsPaginated,
 } from "@/lib/honcho";
 import { isHonchoAppError } from "@/lib/honcho-errors";
-import { HonchoErrorState } from "@/components/ui/honcho-error-state";
-import { WorkspacesTable } from "./workspaces-table";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Workspaces" };
 

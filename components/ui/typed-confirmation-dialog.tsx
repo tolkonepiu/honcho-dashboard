@@ -1,8 +1,11 @@
 "use client";
 
-import { type FormEvent, useEffect, useId, useRef } from "react";
-import { dangerButtonClass, subtleButtonClass } from "@/components/ui/button-styles";
+import {
+  dangerButtonClass,
+  subtleButtonClass,
+} from "@/components/ui/button-styles";
 import { Surface } from "@/components/ui/surface";
+import { type FormEvent, useEffect, useId, useRef } from "react";
 
 type TypedConfirmationDialogProps = {
   isOpen: boolean;
@@ -99,7 +102,10 @@ export function TypedConfirmationDialog({
             <h2 id={titleId} className="ui-title">
               {title}
             </h2>
-            <p id={descriptionId} className="text-xs leading-5 text-[var(--text-muted)]">
+            <p
+              id={descriptionId}
+              className="text-xs leading-5 text-[var(--text-muted)]"
+            >
               {description}
             </p>
           </div>
@@ -111,10 +117,7 @@ export function TypedConfirmationDialog({
             <p className="ui-surface-subtle ui-compact-text px-2.5 py-2 font-mono text-[var(--text-primary)]">
               {expectedValue}
             </p>
-            <label
-              htmlFor={inputId}
-              className="ui-section-label block"
-            >
+            <label htmlFor={inputId} className="ui-section-label block">
               Confirm ID
             </label>
             <input
@@ -133,7 +136,9 @@ export function TypedConfirmationDialog({
             />
           </div>
 
-          {error ? <p className="text-xs text-[var(--color-danger)]">{error}</p> : null}
+          {error ? (
+            <p className="text-xs text-[var(--color-danger)]">{error}</p>
+          ) : null}
 
           <div className="flex items-center justify-end gap-2">
             <button

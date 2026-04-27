@@ -1,11 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Surface } from "@/components/ui/surface";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Surface } from "@/components/ui/surface";
 import { TableRefreshButton } from "@/components/ui/table-controls";
 import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
 import { getApiErrorMessage } from "@/lib/api-client";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type PeerCardSectionProps = {
   workspaceId: string;
@@ -159,9 +159,7 @@ export function PeerCardSection({
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="ui-section-label">
-          Peer Card
-        </h2>
+        <h2 className="ui-section-label">Peer Card</h2>
 
         <div className="flex items-center gap-1.5">
           {isEditing ? (
@@ -250,14 +248,16 @@ export function PeerCardSection({
               aria-label="Edit peer card"
             />
           ) : (
-            <p className="px-4 py-3 break-normal hyphens-none whitespace-pre-wrap text-sm leading-6 text-[var(--text-primary)] sm:px-5">
+            <p className="px-4 py-3 text-sm leading-6 break-normal hyphens-none whitespace-pre-wrap text-[var(--text-primary)] sm:px-5">
               {readCardText || "—"}
             </p>
           )}
         </Surface>
       )}
 
-      {error ? <p className="text-xs text-[var(--color-danger)]">{error}</p> : null}
+      {error ? (
+        <p className="text-xs text-[var(--color-danger)]">{error}</p>
+      ) : null}
     </section>
   );
 }

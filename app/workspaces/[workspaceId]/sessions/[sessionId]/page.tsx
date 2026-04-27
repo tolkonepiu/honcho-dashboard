@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { MessagesSection } from "./messages-section";
+import { SessionPeersSection } from "./session-peers-section";
 import { Badge } from "@/components/ui/badge";
 import { HonchoErrorState } from "@/components/ui/honcho-error-state";
 import { JsonPanel } from "@/components/ui/json-panel";
@@ -16,8 +16,8 @@ import {
   type PaginatedResult,
 } from "@/lib/honcho";
 import { isHonchoAppError } from "@/lib/honcho-errors";
-import { MessagesSection } from "./messages-section";
-import { SessionPeersSection } from "./session-peers-section";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 type Props = {
   params: Promise<{ workspaceId: string; sessionId: string }>;

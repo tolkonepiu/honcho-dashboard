@@ -15,7 +15,7 @@ export function JsonPanel({ title, value }: JsonPanelProps) {
       <h2 className="ui-section-label">{title}</h2>
 
       <Surface className="overflow-hidden">
-        <pre className="overflow-x-auto whitespace-pre-wrap break-words p-4 font-mono text-xs leading-5 text-[var(--text-secondary)] sm:px-6">
+        <pre className="overflow-x-auto p-4 font-mono text-xs leading-5 break-words whitespace-pre-wrap text-[var(--text-secondary)] sm:px-6">
           {JSON.stringify(value, null, 2)}
         </pre>
       </Surface>

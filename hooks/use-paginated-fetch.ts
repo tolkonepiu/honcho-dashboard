@@ -1,3 +1,5 @@
+import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
+import { getApiErrorMessage } from "@/lib/api-client";
 import {
   type Dispatch,
   type SetStateAction,
@@ -6,8 +8,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { getApiErrorMessage } from "@/lib/api-client";
-import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
 
 type UsePaginatedFetchOptions<TData> = {
   entityName: string;
