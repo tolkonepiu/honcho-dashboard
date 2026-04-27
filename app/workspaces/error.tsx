@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
 import { subtleButtonClass } from "@/components/ui/button-styles";
+import { useEffect } from "react";
 
 export default function ErrorPage({
   error,

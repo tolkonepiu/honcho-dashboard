@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Surface } from "@/components/ui/surface";
 import { TableRefreshButton } from "@/components/ui/table-controls";
+import type { ReactNode } from "react";
 
 type DataSectionProps = {
   title: string;
@@ -28,8 +28,7 @@ export function DataSection({
   error,
   children,
 }: DataSectionProps) {
-  const resolvedTitleClassName =
-    titleClassName ?? "ui-section-label";
+  const resolvedTitleClassName = titleClassName ?? "ui-section-label";
 
   return (
     <section className="space-y-3">
@@ -48,12 +47,12 @@ export function DataSection({
       {total === 0 ? (
         <EmptyState title={emptyTitle} description={emptyDescription} />
       ) : (
-        <Surface className="overflow-hidden">
-          {children}
-        </Surface>
+        <Surface className="overflow-hidden">{children}</Surface>
       )}
 
-      {error ? <p className="text-xs text-[var(--color-danger)]">{error}</p> : null}
+      {error ? (
+        <p className="text-xs text-[var(--color-danger)]">{error}</p>
+      ) : null}
     </section>
   );
 }

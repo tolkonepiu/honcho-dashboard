@@ -1,5 +1,4 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { SessionsSection } from "../sessions-section";
 import { HonchoErrorState } from "@/components/ui/honcho-error-state";
 import {
   type DashboardSession,
@@ -9,7 +8,8 @@ import {
   listSessionsPaginated,
 } from "@/lib/honcho";
 import { isHonchoAppError } from "@/lib/honcho-errors";
-import { SessionsSection } from "../sessions-section";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 type Props = { params: Promise<{ workspaceId: string }> };
 

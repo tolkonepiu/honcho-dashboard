@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { useCallback, useState } from "react";
 import { ClickableTableRow } from "@/components/ui/clickable-table-row";
 import { DataSection } from "@/components/ui/data-section";
 import { JsonCell } from "@/components/ui/json-cell";
@@ -9,6 +7,8 @@ import { RelativeTime } from "@/components/ui/relative-time";
 import { TablePager } from "@/components/ui/table-controls";
 import { usePaginatedFetch } from "@/hooks/use-paginated-fetch";
 import { usePagination } from "@/hooks/use-pagination";
+import Link from "next/link";
+import { useCallback, useState } from "react";
 
 type PeerRow = {
   id: string;
@@ -130,7 +130,7 @@ export function PeersSection({
                   <td className="px-4 py-3 font-medium text-[var(--text-primary)] sm:px-6">
                     <Link
                       href={href}
-                        className="inline-flex rounded-sm underline-offset-2 transition-colors group-hover:text-[var(--color-accent)] hover:underline"
+                      className="inline-flex rounded-sm underline-offset-2 transition-colors group-hover:text-[var(--color-accent)] hover:underline"
                     >
                       {peer.id}
                     </Link>

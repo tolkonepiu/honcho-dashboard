@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { cn } from "@/lib/cn";
+import Link from "next/link";
 
 export type BreadcrumbItem = {
   label: string;
@@ -17,10 +17,7 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
   }
 
   return (
-    <nav
-      aria-label="Breadcrumb"
-      className={cn("min-w-0", className)}
-    >
+    <nav aria-label="Breadcrumb" className={cn("min-w-0", className)}>
       <ol className="ui-section-label flex flex-wrap items-center gap-x-2 gap-y-1">
         {items.map((item, index) => {
           const isCurrent = index === items.length - 1;

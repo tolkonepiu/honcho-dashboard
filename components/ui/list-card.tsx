@@ -1,7 +1,7 @@
+import { Surface } from "@/components/ui/surface";
+import { cn } from "@/lib/cn";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { cn } from "@/lib/cn";
-import { Surface } from "@/components/ui/surface";
 
 type ListCardProps = {
   children: ReactNode;
@@ -24,7 +24,7 @@ export function ListCard({ children, href, className }: ListCardProps) {
           {children}
           <span
             aria-hidden
-            className="ui-compact-text absolute right-4 top-4 text-[var(--text-dim)] transition-colors group-hover:text-[var(--color-accent)]"
+            className="ui-compact-text absolute top-4 right-4 text-[var(--text-dim)] transition-colors group-hover:text-[var(--color-accent)]"
           >
             <i className="hn hn-arrow-right-solid" />
           </span>
@@ -41,19 +41,11 @@ export function ListCard({ children, href, className }: ListCardProps) {
 }
 
 export function ListCardHeader({ children, className }: ListCardSectionProps) {
-  return (
-    <div className={cn("space-y-1", className)}>{children}</div>
-  );
+  return <div className={cn("space-y-1", className)}>{children}</div>;
 }
 
 export function ListCardTitle({ children, className }: ListCardSectionProps) {
-  return (
-      <h3
-        className={cn("ui-title", className)}
-      >
-        {children}
-      </h3>
-  );
+  return <h3 className={cn("ui-title", className)}>{children}</h3>;
 }
 
 export function ListCardDescription({
@@ -61,23 +53,21 @@ export function ListCardDescription({
   className,
 }: ListCardSectionProps) {
   return (
-      <p
-        className={cn("text-xs leading-5 text-[var(--text-muted)]", className)}
-      >
-        {children}
-      </p>
+    <p className={cn("text-xs leading-5 text-[var(--text-muted)]", className)}>
+      {children}
+    </p>
   );
 }
 
 export function ListCardFooter({ children, className }: ListCardSectionProps) {
   return (
-      <div
-        className={cn(
-          "mt-4 border-t-2 border-[var(--pixel-border)] pt-3 text-xs text-[var(--text-secondary)]",
-          className,
-        )}
-      >
-        {children}
-      </div>
+    <div
+      className={cn(
+        "mt-4 border-t-2 border-[var(--pixel-border)] pt-3 text-xs text-[var(--text-secondary)]",
+        className,
+      )}
+    >
+      {children}
+    </div>
   );
 }

@@ -1,8 +1,8 @@
 "use client";
 
+import { cn } from "@/lib/cn";
 import { useRouter } from "next/navigation";
 import type { MouseEvent, ReactNode } from "react";
-import { cn } from "@/lib/cn";
 
 type ClickableTableRowProps = {
   href: string;

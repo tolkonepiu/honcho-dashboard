@@ -1,5 +1,4 @@
-import "server-only";
-
+import { HonchoAppError, normalizeHonchoError } from "@/lib/honcho-errors";
 import type {
   ConclusionResponse,
   MessageResponse,
@@ -9,7 +8,7 @@ import type {
   WorkspaceResponse,
 } from "@honcho-ai/sdk";
 import { Honcho, type Session } from "@honcho-ai/sdk";
-import { HonchoAppError, normalizeHonchoError } from "@/lib/honcho-errors";
+import "server-only";
 
 const API_PREFIX = "/v3";
 const PAGE_SIZE = 100;

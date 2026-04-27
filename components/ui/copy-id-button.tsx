@@ -29,9 +29,7 @@ export function CopyIdButton({ id, copiedId, onCopy }: CopyIdButtonProps) {
         }}
         className={metadataButtonClass}
       >
-        <span className="ui-compact-kicker">
-          ID
-        </span>
+        <span className="ui-compact-kicker">ID</span>
         <span className="font-mono text-[var(--text-muted)]">{id}</span>
       </button>
 
