@@ -1,7 +1,6 @@
 import { MessagesSection } from "./messages-section";
 import { SessionPeersSection } from "./session-peers-section";
 import { Badge } from "@/components/ui/badge";
-import { HonchoErrorState } from "@/components/ui/honcho-error-state";
 import { JsonPanel } from "@/components/ui/json-panel";
 import { PageHeaderActions } from "@/components/ui/page-header-actions";
 import { RelativeTime } from "@/components/ui/relative-time";
@@ -9,15 +8,13 @@ import { StatCard } from "@/components/ui/stat-card";
 import {
   type DashboardMessage,
   type DashboardPeer,
-  type DashboardSession,
   getSession,
   getSessionPeers,
   listMessagesPaginated,
   type PaginatedResult,
 } from "@/lib/honcho";
-import { isHonchoAppError } from "@/lib/honcho-errors";
+import { loadHonchoPageData, loadHonchoPageEntity } from "@/lib/page-data";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 
 type Props = {
   params: Promise<{ workspaceId: string; sessionId: string }>;
@@ -34,25 +31,20 @@ export default async function SessionDetailPage({ params }: Props) {
   const encodedSessionId = encodeURIComponent(sessionId);
   const wsBase = `/workspaces/${encodedWorkspaceId}`;
 
-  let session: DashboardSession | null;
-  try {
-    session = await getSession(workspaceId, sessionId);
-  } catch (error) {
-    if (isHonchoAppError(error)) {
-      return <HonchoErrorState message={error.message} />;
-    }
-
-    throw error;
+  const sessionResult = await loadHonchoPageEntity(() =>
+    getSession(workspaceId, sessionId),
+  );
+  if (sessionResult.errorElement) {
+    return sessionResult.errorElement;
   }
 
-  if (!session) {
-    notFound();
-  }
+  const session = sessionResult.data;
 
-  let initialMessages: PaginatedResult<DashboardMessage>;
-  let initialPeers: DashboardPeer[];
-  try {
-    [initialMessages, initialPeers] = await Promise.all([
+  const initialDataResult = await loadHonchoPageData<{
+    initialMessages: PaginatedResult<DashboardMessage>;
+    initialPeers: DashboardPeer[];
+  }>(async () => {
+    const [initialMessages, initialPeers] = await Promise.all([
       listMessagesPaginated(workspaceId, sessionId, {
         page: 1,
         size: 10,
@@ -60,13 +52,14 @@ export default async function SessionDetailPage({ params }: Props) {
       }),
       getSessionPeers(workspaceId, sessionId),
     ]);
-  } catch (error) {
-    if (isHonchoAppError(error)) {
-      return <HonchoErrorState message={error.message} />;
-    }
 
-    throw error;
+    return { initialMessages, initialPeers };
+  });
+  if (initialDataResult.errorElement) {
+    return initialDataResult.errorElement;
   }
+
+  const { initialMessages, initialPeers } = initialDataResult.data;
 
   return (
     <div className="space-y-6">

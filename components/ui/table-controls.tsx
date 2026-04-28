@@ -98,7 +98,10 @@ export function TablePager({
           type="button"
           onClick={onFirst}
           disabled={!canPageBack || isPending}
-          className={`${pagerButtonClass} ${getPagerButtonStateClass(canPageBack, isPending)}`}
+          className={cn(
+            pagerButtonClass,
+            getPagerButtonStateClass(canPageBack, isPending),
+          )}
           aria-label="First page"
         >
           <i aria-hidden className="hn hn-angle-left-solid ui-icon-sm" />
@@ -108,7 +111,10 @@ export function TablePager({
           type="button"
           onClick={onPrevious}
           disabled={!canPageBack || isPending}
-          className={`${pagerButtonClass} ${getPagerButtonStateClass(canPageBack, isPending)}`}
+          className={cn(
+            pagerButtonClass,
+            getPagerButtonStateClass(canPageBack, isPending),
+          )}
           aria-label="Previous page"
         >
           <i aria-hidden className="hn hn-arrow-left-solid ui-icon-sm" />
@@ -122,7 +128,10 @@ export function TablePager({
           type="button"
           onClick={onNext}
           disabled={!canPageForward || isPending}
-          className={`${pagerButtonClass} ${getPagerButtonStateClass(canPageForward, isPending)}`}
+          className={cn(
+            pagerButtonClass,
+            getPagerButtonStateClass(canPageForward, isPending),
+          )}
           aria-label="Next page"
         >
           <i aria-hidden className="hn hn-arrow-right-solid ui-icon-sm" />
@@ -132,7 +141,10 @@ export function TablePager({
           type="button"
           onClick={onLast}
           disabled={!canJumpToLast || isPending}
-          className={`${pagerButtonClass} ${getPagerButtonStateClass(canJumpToLast, isPending)}`}
+          className={cn(
+            pagerButtonClass,
+            getPagerButtonStateClass(canJumpToLast, isPending),
+          )}
           aria-label="Last page"
         >
           <i aria-hidden className="hn hn-angle-right-solid ui-icon-sm" />

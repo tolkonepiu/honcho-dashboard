@@ -1,14 +1,11 @@
 "use client";
 
 import { ClickableTableRow } from "@/components/ui/clickable-table-row";
-import { DataSection } from "@/components/ui/data-section";
 import { JsonCell } from "@/components/ui/json-cell";
+import { PaginatedTableShell } from "@/components/ui/paginated-table-shell";
 import { RelativeTime } from "@/components/ui/relative-time";
-import { TablePager } from "@/components/ui/table-controls";
-import { usePaginatedFetch } from "@/hooks/use-paginated-fetch";
-import { usePagination } from "@/hooks/use-pagination";
+import { usePaginatedTable } from "@/hooks/use-paginated-table";
 import Link from "next/link";
-import { useCallback, useState } from "react";
 
 type WorkspaceRow = {
   id: string;
@@ -32,122 +29,85 @@ type WorkspacesTableProps = {
 };
 
 export function WorkspacesTable({ initialWorkspaces }: WorkspacesTableProps) {
-  const [query, setQuery] = useState({ page: initialWorkspaces.page });
-  const [workspaces, setWorkspaces] = useState(initialWorkspaces);
-  const pageSize = workspaces.size || 10;
-  const pagination = usePagination(setQuery, workspaces.pages);
-
-  const buildWorkspacesUrl = useCallback(
-    (refreshNonce: number) => {
-      const params = new URLSearchParams();
-      params.set("page", String(query.page));
-      params.set("size", String(pageSize));
-      if (refreshNonce > 0) {
-        params.set("refresh", String(refreshNonce));
-      }
-
-      return `/api/workspaces?${params.toString()}`;
-    },
-    [pageSize, query],
-  );
-
-  const {
-    isPending,
-    error,
-    refresh: refreshWorkspaces,
-  } = usePaginatedFetch<PaginatedWorkspaceData>({
-    entityName: "workspaces",
-    buildUrl: buildWorkspacesUrl,
-    setData: setWorkspaces,
-  });
+  const { data, query, pageSize, pagination, isPending, error, refresh } =
+    usePaginatedTable<WorkspaceRow, PaginatedWorkspaceData>({
+      initialData: initialWorkspaces,
+      apiPath: "/api/workspaces",
+      entityName: "workspaces",
+    });
 
   return (
-    <DataSection
+    <PaginatedTableShell
       title="Workspaces"
       titleClassName="text-2xl font-semibold tracking-tight text-[var(--text-primary)]"
-      total={workspaces.total}
+      total={data.total}
       isPending={isPending}
-      onRefresh={refreshWorkspaces}
+      onRefresh={refresh}
       refreshLabel="Refresh workspaces"
       emptyTitle="No workspaces"
       emptyDescription="No workspaces have been created yet."
       error={error}
-    >
-      <div className="overflow-x-auto">
-        <table className="min-w-full text-left text-sm">
-          <thead className="ui-table-head tracking-wide">
-            <tr>
-              <th scope="col" className="px-4 py-3 font-medium sm:px-6">
-                Workspace ID
-              </th>
-              <th scope="col" className="px-4 py-3 font-medium sm:px-6">
-                Created At
-              </th>
-              <th scope="col" className="px-4 py-3 font-medium sm:px-6">
-                Sessions
-              </th>
-              <th scope="col" className="px-4 py-3 font-medium sm:px-6">
-                Peers
-              </th>
-              <th scope="col" className="px-4 py-3 font-medium sm:px-6">
-                Metadata
-              </th>
-              <th scope="col" className="px-4 py-3 font-medium sm:px-6">
-                Configuration
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[var(--surface-border-muted)]">
-            {workspaces.items.map((workspace) => {
-              const href = `/workspaces/${encodeURIComponent(workspace.id)}`;
+      theadClassName="ui-table-head tracking-wide"
+      headerRow={
+        <tr>
+          <th scope="col" className="px-4 py-3 font-medium sm:px-6">
+            Workspace ID
+          </th>
+          <th scope="col" className="px-4 py-3 font-medium sm:px-6">
+            Created At
+          </th>
+          <th scope="col" className="px-4 py-3 font-medium sm:px-6">
+            Sessions
+          </th>
+          <th scope="col" className="px-4 py-3 font-medium sm:px-6">
+            Peers
+          </th>
+          <th scope="col" className="px-4 py-3 font-medium sm:px-6">
+            Metadata
+          </th>
+          <th scope="col" className="px-4 py-3 font-medium sm:px-6">
+            Configuration
+          </th>
+        </tr>
+      }
+      bodyRows={data.items.map((workspace) => {
+        const href = `/workspaces/${encodeURIComponent(workspace.id)}`;
 
-              return (
-                <ClickableTableRow
-                  href={href}
-                  key={workspace.id}
-                  className="group"
-                >
-                  <td className="px-4 py-3 font-medium text-[var(--text-primary)] sm:px-6">
-                    <Link
-                      href={href}
-                      className="inline-flex rounded-sm underline-offset-2 transition-colors group-hover:text-[var(--color-accent)] hover:underline"
-                    >
-                      {workspace.id}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-[var(--text-muted)] sm:px-6">
-                    <RelativeTime value={workspace.createdAt} />
-                  </td>
-                  <td className="px-4 py-3 text-[var(--text-muted)] sm:px-6">
-                    {workspace.sessionCount}
-                  </td>
-                  <td className="px-4 py-3 text-[var(--text-muted)] sm:px-6">
-                    {workspace.peerCount}
-                  </td>
-                  <td className="px-4 py-3 align-top sm:px-6">
-                    <JsonCell value={workspace.metadata} />
-                  </td>
-                  <td className="px-4 py-3 align-top sm:px-6">
-                    <JsonCell value={workspace.configuration} />
-                  </td>
-                </ClickableTableRow>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      <TablePager
-        page={query.page}
-        pages={workspaces.pages}
-        size={pageSize}
-        total={workspaces.total}
-        isPending={isPending}
-        onFirst={pagination.onFirst}
-        onPrevious={pagination.onPrevious}
-        onNext={pagination.onNext}
-        onLast={pagination.onLast}
-      />
-    </DataSection>
+        return (
+          <ClickableTableRow href={href} key={workspace.id} className="group">
+            <td className="px-4 py-3 font-medium text-[var(--text-primary)] sm:px-6">
+              <Link
+                href={href}
+                className="inline-flex rounded-sm underline-offset-2 transition-colors group-hover:text-[var(--color-accent)] hover:underline"
+              >
+                {workspace.id}
+              </Link>
+            </td>
+            <td className="px-4 py-3 text-[var(--text-muted)] sm:px-6">
+              <RelativeTime value={workspace.createdAt} />
+            </td>
+            <td className="px-4 py-3 text-[var(--text-muted)] sm:px-6">
+              {workspace.sessionCount}
+            </td>
+            <td className="px-4 py-3 text-[var(--text-muted)] sm:px-6">
+              {workspace.peerCount}
+            </td>
+            <td className="px-4 py-3 align-top sm:px-6">
+              <JsonCell value={workspace.metadata} />
+            </td>
+            <td className="px-4 py-3 align-top sm:px-6">
+              <JsonCell value={workspace.configuration} />
+            </td>
+          </ClickableTableRow>
+        );
+      })}
+      page={query.page}
+      pages={data.pages}
+      pageSize={pageSize}
+      onFirst={pagination.onFirst}
+      onPrevious={pagination.onPrevious}
+      onNext={pagination.onNext}
+      onLast={pagination.onLast}
+    />
   );
 }

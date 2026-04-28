@@ -1,30 +1,29 @@
 import { WorkspacesTable } from "./workspaces-table";
-import { HonchoErrorState } from "@/components/ui/honcho-error-state";
 import {
   type DashboardWorkspaceTableRow,
   type PaginatedResult,
   listWorkspaceTableRowsPaginated,
 } from "@/lib/honcho";
-import { isHonchoAppError } from "@/lib/honcho-errors";
+import { loadHonchoPageData } from "@/lib/page-data";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "Workspaces" };
 
 export default async function WorkspacesPage() {
-  let initialWorkspaces: PaginatedResult<DashboardWorkspaceTableRow>;
-
-  try {
-    initialWorkspaces = await listWorkspaceTableRowsPaginated({
+  const initialWorkspacesResult = await loadHonchoPageData<
+    PaginatedResult<DashboardWorkspaceTableRow>
+  >(() =>
+    listWorkspaceTableRowsPaginated({
       page: 1,
       size: 10,
-    });
-  } catch (error) {
-    if (isHonchoAppError(error)) {
-      return <HonchoErrorState message={error.message} />;
-    }
+    }),
+  );
 
-    throw error;
+  if (initialWorkspacesResult.errorElement) {
+    return initialWorkspacesResult.errorElement;
   }
+
+  const initialWorkspaces = initialWorkspacesResult.data;
 
   return (
     <div className="space-y-6">

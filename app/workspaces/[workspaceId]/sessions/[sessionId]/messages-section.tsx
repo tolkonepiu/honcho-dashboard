@@ -8,10 +8,10 @@ import { SelectField } from "@/components/ui/select-field";
 import { Surface } from "@/components/ui/surface";
 import { TablePager, TableRefreshButton } from "@/components/ui/table-controls";
 import { useClipboard } from "@/hooks/use-clipboard";
-import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
+import { usePaginatedFetch } from "@/hooks/use-paginated-fetch";
 import { usePagination } from "@/hooks/use-pagination";
-import { getApiErrorMessage } from "@/lib/api-client";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { cn } from "@/lib/cn";
+import { useCallback, useMemo, useState } from "react";
 
 type MessageItem = {
   id: string;
@@ -95,13 +95,19 @@ function MessageListItem({
   onFilterPeer,
 }: MessageListItemProps) {
   return (
-    <li className={`flex ${isRight ? "justify-end" : "justify-start"}`}>
+    <li className={cn("flex", isRight ? "justify-end" : "justify-start")}>
       <article className="w-full max-w-4xl">
         <div
-          className={`flex min-w-0 flex-1 flex-col space-y-2 ${isRight ? "items-end" : "items-start"}`}
+          className={cn(
+            "flex min-w-0 flex-1 flex-col space-y-2",
+            isRight ? "items-end" : "items-start",
+          )}
         >
           <div
-            className={`flex w-full flex-wrap items-center gap-x-2 gap-y-1 ${isRight ? "justify-end" : "justify-start"}`}
+            className={cn(
+              "flex w-full flex-wrap items-center gap-x-2 gap-y-1",
+              isRight ? "justify-end" : "justify-start",
+            )}
           >
             <button
               type="button"
@@ -129,9 +135,10 @@ function MessageListItem({
           </Surface>
 
           <div
-            className={`ui-compact-text flex w-full max-w-3xl flex-wrap items-center gap-2 text-[var(--text-muted)] ${
-              isRight ? "justify-end" : "justify-start"
-            }`}
+            className={cn(
+              "ui-compact-text flex w-full max-w-3xl flex-wrap items-center gap-2 text-[var(--text-muted)]",
+              isRight ? "justify-end" : "justify-start",
+            )}
           >
             <CopyIdButton
               id={message.id}
@@ -163,11 +170,7 @@ export function MessagesSection({
     reverse: true,
   });
   const [messages, setMessages] = useState(initialMessages);
-  const [isPending, setIsPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [refreshNonce, setRefreshNonce] = useState(0);
-  const isFirstRender = useRef(true);
-  const requestId = useRef(0);
+  const [actionError, setActionError] = useState<string | null>(null);
   const { copiedId, copyToClipboard } = useClipboard();
   const pageSize = initialMessages.size || 10;
   const pagination = usePagination(setQuery, messages.pages);
@@ -182,97 +185,40 @@ export function MessagesSection({
     [peerIds, query.peerId],
   );
 
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-
-    const currentRequestId = requestId.current + 1;
-    requestId.current = currentRequestId;
-    const abortController = new AbortController();
-
-    const fetchMessages = async () => {
-      setIsPending(true);
-
-      try {
-        const params = new URLSearchParams();
-        params.set("page", String(query.page));
-        params.set("size", String(pageSize));
-        params.set("reverse", String(query.reverse));
-        if (refreshNonce > 0) {
-          params.set("refresh", String(refreshNonce));
-        }
-
-        if (query.peerId) {
-          params.set("filters", JSON.stringify({ peer_id: query.peerId }));
-        }
-
-        const response = await fetch(
-          `/api/workspaces/${encodeURIComponent(workspaceId)}/sessions/${encodeURIComponent(sessionId)}/messages?${params.toString()}`,
-          {
-            cache: "no-store",
-            signal: abortController.signal,
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            await getApiErrorMessage(
-              response,
-              `Failed to load messages (${response.status}).`,
-            ),
-          );
-        }
-
-        const data = (await response.json()) as PaginatedMessagesData;
-        if (requestId.current !== currentRequestId) {
-          return;
-        }
-
-        setMessages(data);
-        setError(null);
-      } catch (fetchError) {
-        if (
-          abortController.signal.aborted ||
-          requestId.current !== currentRequestId
-        ) {
-          return;
-        }
-
-        const message =
-          fetchError instanceof Error
-            ? fetchError.message
-            : "Failed to load messages.";
-        setError(message);
-      } finally {
-        if (requestId.current === currentRequestId) {
-          setIsPending(false);
-        }
+  const buildMessagesUrl = useCallback(
+    (refreshNonce: number) => {
+      const params = new URLSearchParams();
+      params.set("page", String(query.page));
+      params.set("size", String(pageSize));
+      params.set("reverse", String(query.reverse));
+      if (refreshNonce > 0) {
+        params.set("refresh", String(refreshNonce));
       }
-    };
 
-    void fetchMessages();
+      if (query.peerId) {
+        params.set("filters", JSON.stringify({ peer_id: query.peerId }));
+      }
 
-    return () => {
-      abortController.abort();
-    };
-  }, [pageSize, query, refreshNonce, sessionId, workspaceId]);
+      return `/api/workspaces/${encodeURIComponent(workspaceId)}/sessions/${encodeURIComponent(sessionId)}/messages?${params.toString()}`;
+    },
+    [pageSize, query, sessionId, workspaceId],
+  );
 
-  const refreshMessages = useCallback(() => {
-    if (isPending) {
-      return;
-    }
-
-    setRefreshNonce((previous) => previous + 1);
-  }, [isPending]);
-
-  usePageRefreshSignal(refreshMessages);
+  const {
+    isPending,
+    error,
+    refresh: refreshMessages,
+  } = usePaginatedFetch<PaginatedMessagesData>({
+    entityName: "messages",
+    buildUrl: buildMessagesUrl,
+    setData: setMessages,
+  });
 
   const copyMessageId = async (id: string) => {
+    setActionError(null);
     const didCopy = await copyToClipboard(id);
     if (!didCopy) {
-      setError("Could not copy message ID.");
+      setActionError("Could not copy message ID.");
     }
   };
 
@@ -377,8 +323,10 @@ export function MessagesSection({
         />
       </Surface>
 
-      {error ? (
-        <p className="text-xs text-[var(--color-danger)]">{error}</p>
+      {(actionError ?? error) ? (
+        <p className="text-xs text-[var(--color-danger)]">
+          {actionError ?? error}
+        </p>
       ) : null}
     </section>
   );

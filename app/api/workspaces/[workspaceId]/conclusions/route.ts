@@ -1,11 +1,37 @@
 import {
-  parseBooleanQuery,
-  parsePositiveInteger,
-  routeHandler,
-} from "@/lib/api-utils";
+  nonEmptyStringField,
+  optionalNonEmptyStringField,
+  pageQueryField,
+  reverseQueryField,
+  sizeQueryField,
+} from "@/lib/api-schemas";
+import { parseApiInput, parseApiQuery, routeHandler } from "@/lib/api-utils";
 import { listConclusions } from "@/lib/honcho";
+import { z } from "zod";
 
 export const dynamic = "force-dynamic";
+
+const conclusionsRouteParamsSchema = z.object({
+  workspaceId: nonEmptyStringField,
+});
+
+const conclusionsQuerySchema = z
+  .object({
+    page: pageQueryField,
+    size: sizeQueryField,
+    reverse: reverseQueryField,
+    observer_id: optionalNonEmptyStringField,
+    observed_id: optionalNonEmptyStringField,
+    session_id: optionalNonEmptyStringField,
+  })
+  .transform(({ observer_id, observed_id, session_id, ...pagination }) => ({
+    ...pagination,
+    filters: {
+      ...(observer_id ? { observer_id } : {}),
+      ...(observed_id ? { observed_id } : {}),
+      ...(session_id ? { session_id } : {}),
+    },
+  }));
 
 type RouteContext = {
   params: Promise<{ workspaceId: string }>;
@@ -13,28 +39,20 @@ type RouteContext = {
 
 export const GET = routeHandler(
   async (request: Request, { params }: RouteContext) => {
-    const { workspaceId } = await params;
-    const { searchParams } = new URL(request.url);
-
-    const page = parsePositiveInteger(searchParams.get("page"), 1);
-    const size = 10;
-    const reverse = parseBooleanQuery(searchParams.get("reverse"));
-
-    const observerId = searchParams.get("observer_id")?.trim() || undefined;
-    const observedId = searchParams.get("observed_id")?.trim() || undefined;
-    const sessionId = searchParams.get("session_id")?.trim() || undefined;
-
-    const conclusionFilters = {
-      ...(observerId ? { observer_id: observerId } : {}),
-      ...(observedId ? { observed_id: observedId } : {}),
-      ...(sessionId ? { session_id: sessionId } : {}),
-    };
+    const { workspaceId } = parseApiInput(
+      await params,
+      conclusionsRouteParamsSchema,
+    );
+    const { page, size, reverse, filters } = parseApiQuery(
+      request,
+      conclusionsQuerySchema,
+    );
 
     const conclusions = await listConclusions(workspaceId, {
       page,
       size,
       reverse,
-      filters: conclusionFilters,
+      filters,
     });
 
     return Response.json(conclusions);

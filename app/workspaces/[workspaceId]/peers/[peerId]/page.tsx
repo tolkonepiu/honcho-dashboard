@@ -1,21 +1,18 @@
 import { SessionsSection } from "../../sessions-section";
 import { PeerCardSection } from "./peer-card-section";
-import { HonchoErrorState } from "@/components/ui/honcho-error-state";
 import { JsonPanel } from "@/components/ui/json-panel";
 import { PageHeaderActions } from "@/components/ui/page-header-actions";
 import { RelativeTime } from "@/components/ui/relative-time";
 import { StatCard } from "@/components/ui/stat-card";
 import {
-  type DashboardPeer,
   type DashboardSession,
   getPeer,
   getPeerCard,
   listPeerSessionsPaginated,
   type PaginatedResult,
 } from "@/lib/honcho";
-import { isHonchoAppError } from "@/lib/honcho-errors";
+import { loadHonchoPageData, loadHonchoPageEntity } from "@/lib/page-data";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 
 type Props = { params: Promise<{ workspaceId: string; peerId: string }> };
 
@@ -26,35 +23,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PeerDetailPage({ params }: Props) {
   const { workspaceId, peerId } = await params;
-  let peer: DashboardPeer | null;
-  try {
-    peer = await getPeer(workspaceId, peerId);
-  } catch (error) {
-    if (isHonchoAppError(error)) {
-      return <HonchoErrorState message={error.message} />;
-    }
-
-    throw error;
+  const peerResult = await loadHonchoPageEntity(() =>
+    getPeer(workspaceId, peerId),
+  );
+  if (peerResult.errorElement) {
+    return peerResult.errorElement;
   }
 
-  if (!peer) {
-    notFound();
-  }
+  const peer = peerResult.data;
 
-  let peerCard: string[] | null;
-  let peerSessions: PaginatedResult<DashboardSession>;
-  try {
-    [peerCard, peerSessions] = await Promise.all([
+  const peerDataResult = await loadHonchoPageData<{
+    peerCard: string[] | null;
+    peerSessions: PaginatedResult<DashboardSession>;
+  }>(async () => {
+    const [peerCard, peerSessions] = await Promise.all([
       getPeerCard(workspaceId, peerId),
       listPeerSessionsPaginated(workspaceId, peerId, { page: 1, size: 10 }),
     ]);
-  } catch (error) {
-    if (isHonchoAppError(error)) {
-      return <HonchoErrorState message={error.message} />;
-    }
 
-    throw error;
+    return { peerCard, peerSessions };
+  });
+  if (peerDataResult.errorElement) {
+    return peerDataResult.errorElement;
   }
+
+  const { peerCard, peerSessions } = peerDataResult.data;
 
   const wsBase = `/workspaces/${encodeURIComponent(workspaceId)}`;
 

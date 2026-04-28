@@ -1,14 +1,11 @@
 "use client";
 
 import { ClickableTableRow } from "@/components/ui/clickable-table-row";
-import { DataSection } from "@/components/ui/data-section";
 import { JsonCell } from "@/components/ui/json-cell";
+import { PaginatedTableShell } from "@/components/ui/paginated-table-shell";
 import { RelativeTime } from "@/components/ui/relative-time";
-import { TablePager } from "@/components/ui/table-controls";
-import { usePaginatedFetch } from "@/hooks/use-paginated-fetch";
-import { usePagination } from "@/hooks/use-pagination";
+import { usePaginatedTable } from "@/hooks/use-paginated-table";
 import Link from "next/link";
-import { useCallback, useState } from "react";
 
 type PeerRow = {
   id: string;
@@ -48,9 +45,6 @@ export function PeersSection({
   emptyStateDescription,
   showMetadataColumns,
 }: PeersSectionProps) {
-  const [query, setQuery] = useState({ page: initialPeers.page });
-  const [peers, setPeers] = useState(initialPeers);
-
   const base =
     peersBasePath ?? `/workspaces/${encodeURIComponent(workspaceId)}/peers`;
   const resolvedPeersApiPath =
@@ -59,113 +53,81 @@ export function PeersSection({
   const resolvedEmptyStateTitle = emptyStateTitle ?? "No peers";
   const resolvedEmptyStateDescription =
     emptyStateDescription ?? "This workspace has no peers yet.";
-  const pageSize = peers.size || 10;
-  const pagination = usePagination(setQuery, peers.pages);
-
-  const buildPeersUrl = useCallback(
-    (refreshNonce: number) => {
-      const params = new URLSearchParams();
-      params.set("page", String(query.page));
-      params.set("size", String(pageSize));
-      if (refreshNonce > 0) {
-        params.set("refresh", String(refreshNonce));
-      }
-
-      return `${resolvedPeersApiPath}?${params.toString()}`;
-    },
-    [pageSize, query, resolvedPeersApiPath],
-  );
-
-  const {
-    isPending,
-    error,
-    refresh: refreshPeers,
-  } = usePaginatedFetch<PaginatedPeersData>({
-    entityName: "peers",
-    buildUrl: buildPeersUrl,
-    setData: setPeers,
-  });
+  const { data, query, pageSize, pagination, isPending, error, refresh } =
+    usePaginatedTable<PeerRow, PaginatedPeersData>({
+      initialData: initialPeers,
+      apiPath: resolvedPeersApiPath,
+      entityName: "peers",
+    });
 
   return (
-    <DataSection
+    <PaginatedTableShell
       title={sectionTitle}
       titleClassName={titleClassName}
-      total={peers.total}
+      total={data.total}
       isPending={isPending}
-      onRefresh={refreshPeers}
+      onRefresh={refresh}
       refreshLabel="Refresh peers"
       emptyTitle={resolvedEmptyStateTitle}
       emptyDescription={resolvedEmptyStateDescription}
       error={error}
-    >
-      <div className="overflow-x-auto">
-        <table className="min-w-full text-left text-sm">
-          <thead className="ui-table-head tracking-wide">
-            <tr>
+      theadClassName="ui-table-head tracking-wide"
+      headerRow={
+        <tr>
+          <th scope="col" className="px-4 py-3 font-medium sm:px-6">
+            Peer ID
+          </th>
+          <th scope="col" className="px-4 py-3 font-medium sm:px-6">
+            Created At
+          </th>
+          {showMetadataColumns ? (
+            <>
               <th scope="col" className="px-4 py-3 font-medium sm:px-6">
-                Peer ID
+                Metadata
               </th>
               <th scope="col" className="px-4 py-3 font-medium sm:px-6">
-                Created At
+                Configuration
               </th>
-              {showMetadataColumns ? (
-                <>
-                  <th scope="col" className="px-4 py-3 font-medium sm:px-6">
-                    Metadata
-                  </th>
-                  <th scope="col" className="px-4 py-3 font-medium sm:px-6">
-                    Configuration
-                  </th>
-                </>
-              ) : null}
-            </tr>
-          </thead>
+            </>
+          ) : null}
+        </tr>
+      }
+      bodyRows={data.items.map((peer) => {
+        const href = `${base}/${encodeURIComponent(peer.id)}`;
 
-          <tbody className="divide-y divide-[var(--surface-border-muted)]">
-            {peers.items.map((peer) => {
-              const href = `${base}/${encodeURIComponent(peer.id)}`;
-
-              return (
-                <ClickableTableRow href={href} key={peer.id} className="group">
-                  <td className="px-4 py-3 font-medium text-[var(--text-primary)] sm:px-6">
-                    <Link
-                      href={href}
-                      className="inline-flex rounded-sm underline-offset-2 transition-colors group-hover:text-[var(--color-accent)] hover:underline"
-                    >
-                      {peer.id}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-[var(--text-muted)] sm:px-6">
-                    <RelativeTime value={peer.createdAt} />
-                  </td>
-                  {showMetadataColumns ? (
-                    <>
-                      <td className="px-4 py-3 align-top sm:px-6">
-                        <JsonCell value={peer.metadata} />
-                      </td>
-                      <td className="px-4 py-3 align-top sm:px-6">
-                        <JsonCell value={peer.configuration} />
-                      </td>
-                    </>
-                  ) : null}
-                </ClickableTableRow>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      <TablePager
-        page={query.page}
-        pages={peers.pages}
-        size={pageSize}
-        total={peers.total}
-        isPending={isPending}
-        onFirst={pagination.onFirst}
-        onPrevious={pagination.onPrevious}
-        onNext={pagination.onNext}
-        onLast={pagination.onLast}
-      />
-    </DataSection>
+        return (
+          <ClickableTableRow href={href} key={peer.id} className="group">
+            <td className="px-4 py-3 font-medium text-[var(--text-primary)] sm:px-6">
+              <Link
+                href={href}
+                className="inline-flex rounded-sm underline-offset-2 transition-colors group-hover:text-[var(--color-accent)] hover:underline"
+              >
+                {peer.id}
+              </Link>
+            </td>
+            <td className="px-4 py-3 text-[var(--text-muted)] sm:px-6">
+              <RelativeTime value={peer.createdAt} />
+            </td>
+            {showMetadataColumns ? (
+              <>
+                <td className="px-4 py-3 align-top sm:px-6">
+                  <JsonCell value={peer.metadata} />
+                </td>
+                <td className="px-4 py-3 align-top sm:px-6">
+                  <JsonCell value={peer.configuration} />
+                </td>
+              </>
+            ) : null}
+          </ClickableTableRow>
+        );
+      })}
+      page={query.page}
+      pages={data.pages}
+      pageSize={pageSize}
+      onFirst={pagination.onFirst}
+      onPrevious={pagination.onPrevious}
+      onNext={pagination.onNext}
+      onLast={pagination.onLast}
+    />
   );
 }
