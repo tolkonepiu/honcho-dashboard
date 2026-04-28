@@ -9,10 +9,10 @@ import { RelativeTime } from "@/components/ui/relative-time";
 import { Surface } from "@/components/ui/surface";
 import { TablePager, TableRefreshButton } from "@/components/ui/table-controls";
 import { useClipboard } from "@/hooks/use-clipboard";
-import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
+import { usePaginatedFetch } from "@/hooks/use-paginated-fetch";
 import { usePagination } from "@/hooks/use-pagination";
 import { getApiErrorMessage } from "@/lib/api-client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 
 type ConclusionItem = {
   id: string;
@@ -189,84 +189,29 @@ export function ConclusionsPanel({
   const [query, setQuery] = useState<ConclusionsQuery>(initialQuery);
   const [conclusions, setConclusions] =
     useState<ConclusionsData>(initialConclusions);
-  const [isPending, setIsPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [deletingConclusionId, setDeletingConclusionId] = useState<
     string | null
   >(null);
-  const [refreshNonce, setRefreshNonce] = useState(0);
-  const isFirstRender = useRef(true);
-  const requestId = useRef(0);
   const { copiedId, copyToClipboard } = useClipboard();
   const pagination = usePagination(setQuery, conclusions.pages);
   const pageSize = conclusions.size || 10;
 
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
+  const buildUrl = useCallback(
+    (refreshNonce: number) =>
+      buildConclusionsApiUrl(workspaceId, query, pageSize, refreshNonce),
+    [pageSize, query, workspaceId],
+  );
 
-    const currentRequestId = requestId.current + 1;
-    requestId.current = currentRequestId;
-
-    const abortController = new AbortController();
-
-    const fetchConclusions = async () => {
-      setIsPending(true);
-
-      try {
-        const response = await fetch(
-          buildConclusionsApiUrl(workspaceId, query, pageSize, refreshNonce),
-          {
-            cache: "no-store",
-            signal: abortController.signal,
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            await getApiErrorMessage(
-              response,
-              `Failed to load conclusions (${response.status}).`,
-            ),
-          );
-        }
-
-        const data = (await response.json()) as ConclusionsData;
-        if (requestId.current !== currentRequestId) {
-          return;
-        }
-
-        setConclusions(data);
-        setError(null);
-      } catch (fetchError) {
-        if (abortController.signal.aborted) {
-          return;
-        }
-
-        if (requestId.current !== currentRequestId) {
-          return;
-        }
-
-        const message =
-          fetchError instanceof Error
-            ? fetchError.message
-            : "Failed to load conclusions.";
-        setError(message);
-      } finally {
-        if (requestId.current === currentRequestId) {
-          setIsPending(false);
-        }
-      }
-    };
-
-    void fetchConclusions();
-
-    return () => {
-      abortController.abort();
-    };
-  }, [pageSize, query, refreshNonce, workspaceId]);
+  const {
+    isPending,
+    error,
+    refresh: refreshConclusions,
+  } = usePaginatedFetch<ConclusionsData>({
+    entityName: "conclusions",
+    buildUrl,
+    setData: setConclusions,
+  });
 
   const updateQuery = (updates: QueryUpdates, resetPage = true) => {
     setQuery((previous) => {
@@ -299,9 +244,10 @@ export function ConclusionsPanel({
   };
 
   const copyIdToClipboard = async (id: string) => {
+    setActionError(null);
     const didCopy = await copyToClipboard(id);
     if (!didCopy) {
-      setError("Could not copy conclusion ID.");
+      setActionError("Could not copy conclusion ID.");
     }
   };
 
@@ -311,7 +257,7 @@ export function ConclusionsPanel({
     }
 
     setDeletingConclusionId(conclusionId);
-    setError(null);
+    setActionError(null);
 
     try {
       const response = await fetch(
@@ -336,9 +282,9 @@ export function ConclusionsPanel({
         items: previous.items.filter((item) => item.id !== conclusionId),
         total: Math.max(0, previous.total - 1),
       }));
-      setRefreshNonce((previous) => previous + 1);
+      refreshConclusions();
     } catch (deleteError) {
-      setError(
+      setActionError(
         deleteError instanceof Error
           ? deleteError.message
           : "Failed to delete conclusion.",
@@ -347,16 +293,6 @@ export function ConclusionsPanel({
       setDeletingConclusionId(null);
     }
   };
-
-  const refreshConclusions = useCallback(() => {
-    if (isPending) {
-      return;
-    }
-
-    setRefreshNonce((previous) => previous + 1);
-  }, [isPending]);
-
-  usePageRefreshSignal(refreshConclusions);
 
   const filterByObserver = (observerId: string) => {
     updateQuery({ observer_id: observerId }, true);
@@ -441,8 +377,10 @@ export function ConclusionsPanel({
         />
       </Surface>
 
-      {error ? (
-        <p className="text-xs text-[var(--color-danger)]">{error}</p>
+      {(actionError ?? error) ? (
+        <p className="text-xs text-[var(--color-danger)]">
+          {actionError ?? error}
+        </p>
       ) : null}
     </section>
   );

@@ -1,41 +1,88 @@
-import { createHonchoErrorResponse } from "@/lib/honcho-errors";
+import { createHonchoErrorResponse, HonchoAppError } from "@/lib/honcho-errors";
+import { z, type ZodType } from "zod";
 
-export function parsePositiveInteger(
-  value: string | null | undefined,
-  fallback: number,
-  max = Number.POSITIVE_INFINITY,
-): number {
-  if (value == null) return fallback;
-
-  const parsed = Number.parseInt(value, 10);
-  if (!Number.isFinite(parsed) || parsed < 1) return fallback;
-
-  return Math.min(parsed, max);
+function formatValidationIssues(error: z.ZodError) {
+  return error.issues
+    .map((issue) => {
+      const path = issue.path.length > 0 ? issue.path.join(".") : "request";
+      return `${path}: ${issue.message}`;
+    })
+    .join("; ");
 }
 
-export function parseBooleanQuery(value: string | null | undefined): boolean {
-  return value === "true";
-}
+function parseWithSchema<T>(
+  schema: ZodType<T>,
+  input: unknown,
+  errorMessage: string,
+  errorCode: string,
+): T {
+  const result = schema.safeParse(input);
 
-export function parseJsonFilters<T extends Record<string, unknown>>(
-  value: string | null | undefined,
-): T | undefined {
-  if (value == null) return undefined;
-
-  try {
-    const parsed: unknown = JSON.parse(value);
-    if (
-      typeof parsed === "object" &&
-      parsed !== null &&
-      !Array.isArray(parsed)
-    ) {
-      return parsed as T;
-    }
-  } catch {
-    // invalid JSON — ignore
+  if (!result.success) {
+    const details = formatValidationIssues(result.error);
+    throw new HonchoAppError(
+      details ? `${errorMessage} ${details}` : errorMessage,
+      400,
+      errorCode,
+    );
   }
 
-  return undefined;
+  return result.data;
+}
+
+export function parseApiInput<T>(
+  input: unknown,
+  schema: ZodType<T>,
+  errorMessage = "Request input is invalid.",
+  errorCode = "invalid_request_input",
+): T {
+  return parseWithSchema(schema, input, errorMessage, errorCode);
+}
+
+export function parseApiQuery<T>(
+  request: Request,
+  schema: ZodType<T>,
+  errorMessage = "Request query parameters are invalid.",
+  errorCode = "invalid_query_params",
+): T {
+  const { searchParams } = new URL(request.url);
+
+  return parseApiInput(
+    Object.fromEntries(searchParams.entries()),
+    schema,
+    errorMessage,
+    errorCode,
+  );
+}
+
+export async function parseApiJsonBody<T>(
+  request: Request,
+  schema: ZodType<T>,
+  options?: {
+    invalidJsonMessage?: string;
+    invalidJsonCode?: string;
+    invalidBodyMessage?: string;
+    invalidBodyCode?: string;
+  },
+): Promise<T> {
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch {
+    throw new HonchoAppError(
+      options?.invalidJsonMessage ?? "Request body must be valid JSON.",
+      400,
+      options?.invalidJsonCode ?? "invalid_json_body",
+    );
+  }
+
+  return parseApiInput(
+    body,
+    schema,
+    options?.invalidBodyMessage ?? "Request body is invalid.",
+    options?.invalidBodyCode ?? "invalid_request_body",
+  );
 }
 
 export function routeHandler<Args extends unknown[]>(

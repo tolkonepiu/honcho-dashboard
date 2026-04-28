@@ -1,42 +1,19 @@
 import { ConclusionsPanel } from "./conclusions-panel";
 import { PeersSection } from "./peers-section";
 import { SessionsSection } from "./sessions-section";
-import { HonchoErrorState } from "@/components/ui/honcho-error-state";
+import {
+  loadWorkspaceDetailPageData,
+  type WorkspaceDetailSearchParams,
+} from "./workspace-detail-page-data";
 import { JsonPanel } from "@/components/ui/json-panel";
 import { PageHeaderActions } from "@/components/ui/page-header-actions";
 import { RelativeTime } from "@/components/ui/relative-time";
 import { StatCard } from "@/components/ui/stat-card";
-import { parsePositiveInteger } from "@/lib/api-utils";
-import {
-  type DashboardConclusion,
-  type DashboardPeer,
-  type DashboardSession,
-  type DashboardWorkspace,
-  getWorkspace,
-  getWorkspaceStats,
-  listConclusions,
-  listPeers,
-  listPeersPaginated,
-  listSessions,
-  listSessionsPaginated,
-  type PaginatedResult,
-  type WorkspaceStats,
-} from "@/lib/honcho";
-import { isHonchoAppError } from "@/lib/honcho-errors";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-
-type SearchParams = Promise<{
-  page?: string | string[];
-  reverse?: string | string[];
-  observer_id?: string | string[];
-  observed_id?: string | string[];
-  session_id?: string | string[];
-}>;
 
 type Props = {
   params: Promise<{ workspaceId: string }>;
-  searchParams: SearchParams;
+  searchParams: WorkspaceDetailSearchParams;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -44,93 +21,33 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: workspaceId };
 }
 
-function getSingleSearchParam(value: string | string[] | undefined) {
-  return Array.isArray(value) ? value[0] : value;
-}
-
 export default async function WorkspaceDetailPage({
   params,
   searchParams,
 }: Props) {
   const { workspaceId } = await params;
-  const resolvedSearchParams = await searchParams;
 
-  let workspace: DashboardWorkspace | null;
-  try {
-    workspace = await getWorkspace(workspaceId);
-  } catch (error) {
-    if (isHonchoAppError(error)) {
-      return <HonchoErrorState message={error.message} />;
-    }
-
-    throw error;
-  }
-
-  if (!workspace) {
-    notFound();
-  }
-
-  const page = parsePositiveInteger(
-    getSingleSearchParam(resolvedSearchParams.page),
-    1,
+  const workspacePageDataResult = await loadWorkspaceDetailPageData(
+    workspaceId,
+    searchParams,
   );
-  const reverseParam = getSingleSearchParam(resolvedSearchParams.reverse);
-  const reverse = reverseParam === "true";
+  if (workspacePageDataResult.errorElement) {
+    return workspacePageDataResult.errorElement;
+  }
 
-  const observerId = getSingleSearchParam(
-    resolvedSearchParams.observer_id,
-  )?.trim();
-  const observedId = getSingleSearchParam(
-    resolvedSearchParams.observed_id,
-  )?.trim();
-  const sessionId = getSingleSearchParam(
-    resolvedSearchParams.session_id,
-  )?.trim();
-
-  const conclusionFilters = {
-    ...(observerId ? { observer_id: observerId } : {}),
-    ...(observedId ? { observed_id: observedId } : {}),
-    ...(sessionId ? { session_id: sessionId } : {}),
-  };
+  const {
+    workspace,
+    stats,
+    peers,
+    sessions,
+    initialPeers,
+    initialSessions,
+    initialConclusions,
+    initialQuery,
+  } = workspacePageDataResult.data;
 
   const encodedWorkspaceId = encodeURIComponent(workspaceId);
   const base = `/workspaces/${encodedWorkspaceId}`;
-
-  let stats: WorkspaceStats;
-  let peers: DashboardPeer[];
-  let sessions: DashboardSession[];
-  let initialPeers: PaginatedResult<DashboardPeer>;
-  let initialSessions: PaginatedResult<DashboardSession>;
-  let initialConclusions: PaginatedResult<DashboardConclusion>;
-
-  try {
-    [
-      stats,
-      peers,
-      sessions,
-      initialPeers,
-      initialSessions,
-      initialConclusions,
-    ] = await Promise.all([
-      getWorkspaceStats(workspaceId),
-      listPeers(workspaceId),
-      listSessions(workspaceId),
-      listPeersPaginated(workspaceId, { page: 1, size: 10 }),
-      listSessionsPaginated(workspaceId, { page: 1, size: 10 }),
-      listConclusions(workspaceId, {
-        page,
-        size: 10,
-        reverse,
-        filters: conclusionFilters,
-      }),
-    ]);
-  } catch (error) {
-    if (isHonchoAppError(error)) {
-      return <HonchoErrorState message={error.message} />;
-    }
-
-    throw error;
-  }
 
   return (
     <div className="space-y-6">
@@ -181,13 +98,7 @@ export default async function WorkspaceDetailPage({
             workspaceId={workspaceId}
             peerIds={peers.map((peer) => peer.id)}
             sessionIds={sessions.map((session) => session.id)}
-            initialQuery={{
-              page,
-              reverse,
-              observerId,
-              observedId,
-              sessionId,
-            }}
+            initialQuery={initialQuery}
             initialConclusions={initialConclusions}
           />
         </div>

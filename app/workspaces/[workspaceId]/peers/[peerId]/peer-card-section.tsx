@@ -5,6 +5,7 @@ import { Surface } from "@/components/ui/surface";
 import { TableRefreshButton } from "@/components/ui/table-controls";
 import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
 import { getApiErrorMessage } from "@/lib/api-client";
+import { cn } from "@/lib/cn";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 type PeerCardSectionProps = {
@@ -16,12 +17,18 @@ type PeerCardSectionProps = {
 const cardActionButtonBaseClass =
   "inline-flex h-8 w-8 items-center justify-center border shadow-[var(--pixel-shadow-sm)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_srgb,var(--color-accent)_70%,transparent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--surface-elevated)] disabled:cursor-not-allowed disabled:border-[var(--surface-border-muted)] disabled:bg-[var(--surface-elevated)] disabled:text-[var(--text-dim)] disabled:shadow-none";
 
-const neutralCardActionButtonClass = `${cardActionButtonBaseClass} border-[var(--pixel-border)] bg-[var(--surface-strong)] text-[var(--text-muted)] hover:bg-[var(--surface-interactive)] hover:text-[var(--text-primary)]`;
+const neutralCardActionButtonClass = cn(
+  cardActionButtonBaseClass,
+  "border-[var(--pixel-border)] bg-[var(--surface-strong)] text-[var(--text-muted)] hover:bg-[var(--surface-interactive)] hover:text-[var(--text-primary)]",
+);
 
 const editCardActionButtonClass =
   "inline-flex h-8 w-8 items-center justify-center text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:color-mix(in_srgb,var(--color-accent)_70%,transparent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--surface-elevated)] disabled:cursor-not-allowed disabled:text-[var(--text-dim)]";
 
-const acceptCardActionButtonClass = `${cardActionButtonBaseClass} border-[color:color-mix(in_srgb,var(--color-success)_70%,transparent)] bg-[color:color-mix(in_srgb,var(--color-success)_20%,transparent)] text-[var(--color-success)] hover:bg-[color:color-mix(in_srgb,var(--color-success)_30%,transparent)]`;
+const acceptCardActionButtonClass = cn(
+  cardActionButtonBaseClass,
+  "border-[color:color-mix(in_srgb,var(--color-success)_70%,transparent)] bg-[color:color-mix(in_srgb,var(--color-success)_20%,transparent)] text-[var(--color-success)] hover:bg-[color:color-mix(in_srgb,var(--color-success)_30%,transparent)]",
+);
 
 function formatCardText(card: string[] | null): string {
   return (card ?? []).join("\n");
@@ -228,11 +235,11 @@ export function PeerCardSection({
         />
       ) : (
         <Surface
-          className={`overflow-hidden ${
-            isEditing
-              ? "focus-within:border-[var(--color-accent)] focus-within:ring-2 focus-within:ring-[color:color-mix(in_srgb,var(--color-accent)_70%,transparent)] focus-within:ring-offset-1 focus-within:ring-offset-[var(--surface-elevated)]"
-              : ""
-          }`}
+          className={cn(
+            "overflow-hidden",
+            isEditing &&
+              "focus-within:border-[var(--color-accent)] focus-within:ring-2 focus-within:ring-[color:color-mix(in_srgb,var(--color-accent)_70%,transparent)] focus-within:ring-offset-1 focus-within:ring-offset-[var(--surface-elevated)]",
+          )}
         >
           {isEditing ? (
             <textarea

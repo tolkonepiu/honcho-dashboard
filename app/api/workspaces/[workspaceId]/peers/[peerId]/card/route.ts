@@ -1,45 +1,33 @@
-import { routeHandler } from "@/lib/api-utils";
+import { nonEmptyStringField } from "@/lib/api-schemas";
+import { parseApiInput, parseApiJsonBody, routeHandler } from "@/lib/api-utils";
 import { getPeerCard, setPeerCard } from "@/lib/honcho";
-import { HonchoAppError } from "@/lib/honcho-errors";
+import { z } from "zod";
 
 export const dynamic = "force-dynamic";
+
+const peerCardRouteParamsSchema = z.object({
+  workspaceId: nonEmptyStringField,
+  peerId: nonEmptyStringField,
+});
+
+const peerCardRequestBodySchema = z
+  .object({
+    peer_card: z.array(nonEmptyStringField).nullable(),
+  })
+  .strict();
 
 type RouteContext = {
   params: Promise<{ workspaceId: string; peerId: string }>;
 };
 
-function parsePeerCardRequestBody(body: unknown): string[] | null {
-  if (typeof body !== "object" || body === null || Array.isArray(body)) {
-    throw new HonchoAppError(
-      "Peer card updates require an object body with a peer_card field.",
-      400,
-      "invalid_peer_card_body",
-    );
-  }
-
-  const peerCard = (body as { peer_card?: unknown }).peer_card;
-
-  if (peerCard === null) {
-    return null;
-  }
-
-  if (
-    !Array.isArray(peerCard) ||
-    !peerCard.every((entry) => typeof entry === "string")
-  ) {
-    throw new HonchoAppError(
-      "peer_card must be null or an array of strings.",
-      400,
-      "invalid_peer_card_value",
-    );
-  }
-
-  return peerCard;
-}
-
 export const GET = routeHandler(
   async (_request: Request, { params }: RouteContext) => {
-    const { workspaceId, peerId } = await params;
+    const { workspaceId, peerId } = parseApiInput(
+      await params,
+      peerCardRouteParamsSchema,
+      "Route parameters are invalid.",
+      "invalid_route_params",
+    );
     const card = await getPeerCard(workspaceId, peerId);
 
     return Response.json(card);
@@ -48,20 +36,21 @@ export const GET = routeHandler(
 
 export const PUT = routeHandler(
   async (request: Request, { params }: RouteContext) => {
-    const { workspaceId, peerId } = await params;
-
-    let body: unknown;
-    try {
-      body = await request.json();
-    } catch {
-      throw new HonchoAppError(
-        "Request body must be valid JSON.",
-        400,
-        "invalid_json_body",
-      );
-    }
-
-    const peerCard = parsePeerCardRequestBody(body);
+    const { workspaceId, peerId } = parseApiInput(
+      await params,
+      peerCardRouteParamsSchema,
+      "Route parameters are invalid.",
+      "invalid_route_params",
+    );
+    const { peer_card: peerCard } = await parseApiJsonBody(
+      request,
+      peerCardRequestBodySchema,
+      {
+        invalidBodyMessage:
+          "Peer card updates require a peer_card field that is null or an array of strings.",
+        invalidBodyCode: "invalid_peer_card_body",
+      },
+    );
     const updatedCard = await setPeerCard(workspaceId, peerId, peerCard);
 
     return Response.json(updatedCard);
