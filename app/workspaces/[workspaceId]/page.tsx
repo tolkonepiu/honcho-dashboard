@@ -1,41 +1,19 @@
 import { ConclusionsPanel } from "./conclusions-panel";
 import { PeersSection } from "./peers-section";
 import { SessionsSection } from "./sessions-section";
+import {
+  loadWorkspaceDetailPageData,
+  type WorkspaceDetailSearchParams,
+} from "./workspace-detail-page-data";
 import { JsonPanel } from "@/components/ui/json-panel";
 import { PageHeaderActions } from "@/components/ui/page-header-actions";
 import { RelativeTime } from "@/components/ui/relative-time";
 import { StatCard } from "@/components/ui/stat-card";
-import {
-  type DashboardConclusion,
-  type DashboardPeer,
-  type DashboardSession,
-  getWorkspace,
-  getWorkspaceStats,
-  listConclusions,
-  listPeers,
-  listPeersPaginated,
-  listSessions,
-  listSessionsPaginated,
-  type PaginatedResult,
-  type WorkspaceStats,
-} from "@/lib/honcho";
-import { loadHonchoPageData, loadHonchoPageEntity } from "@/lib/page-data";
 import type { Metadata } from "next";
-import { z } from "zod";
-
-const workspacePageSearchParamSchema = z.coerce.number().int().min(1).catch(1);
-
-type SearchParams = Promise<{
-  page?: string | string[];
-  reverse?: string | string[];
-  observer_id?: string | string[];
-  observed_id?: string | string[];
-  session_id?: string | string[];
-}>;
 
 type Props = {
   params: Promise<{ workspaceId: string }>;
-  searchParams: SearchParams;
+  searchParams: WorkspaceDetailSearchParams;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -43,101 +21,33 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: workspaceId };
 }
 
-function getSingleSearchParam(value: string | string[] | undefined) {
-  return Array.isArray(value) ? value[0] : value;
-}
-
 export default async function WorkspaceDetailPage({
   params,
   searchParams,
 }: Props) {
   const { workspaceId } = await params;
-  const resolvedSearchParams = await searchParams;
 
-  const workspaceResult = await loadHonchoPageEntity(() =>
-    getWorkspace(workspaceId),
+  const workspacePageDataResult = await loadWorkspaceDetailPageData(
+    workspaceId,
+    searchParams,
   );
-  if (workspaceResult.errorElement) {
-    return workspaceResult.errorElement;
-  }
-
-  const workspace = workspaceResult.data;
-
-  const page = workspacePageSearchParamSchema.parse(
-    getSingleSearchParam(resolvedSearchParams.page),
-  );
-  const reverseParam = getSingleSearchParam(resolvedSearchParams.reverse);
-  const reverse = reverseParam === "true";
-
-  const observerId = getSingleSearchParam(
-    resolvedSearchParams.observer_id,
-  )?.trim();
-  const observedId = getSingleSearchParam(
-    resolvedSearchParams.observed_id,
-  )?.trim();
-  const sessionId = getSingleSearchParam(
-    resolvedSearchParams.session_id,
-  )?.trim();
-
-  const conclusionFilters = {
-    ...(observerId ? { observer_id: observerId } : {}),
-    ...(observedId ? { observed_id: observedId } : {}),
-    ...(sessionId ? { session_id: sessionId } : {}),
-  };
-
-  const encodedWorkspaceId = encodeURIComponent(workspaceId);
-  const base = `/workspaces/${encodedWorkspaceId}`;
-
-  const workspaceDataResult = await loadHonchoPageData<{
-    stats: WorkspaceStats;
-    peers: DashboardPeer[];
-    sessions: DashboardSession[];
-    initialPeers: PaginatedResult<DashboardPeer>;
-    initialSessions: PaginatedResult<DashboardSession>;
-    initialConclusions: PaginatedResult<DashboardConclusion>;
-  }>(async () => {
-    const [
-      stats,
-      peers,
-      sessions,
-      initialPeers,
-      initialSessions,
-      initialConclusions,
-    ] = await Promise.all([
-      getWorkspaceStats(workspaceId),
-      listPeers(workspaceId),
-      listSessions(workspaceId),
-      listPeersPaginated(workspaceId, { page: 1, size: 10 }),
-      listSessionsPaginated(workspaceId, { page: 1, size: 10 }),
-      listConclusions(workspaceId, {
-        page,
-        size: 10,
-        reverse,
-        filters: conclusionFilters,
-      }),
-    ]);
-
-    return {
-      stats,
-      peers,
-      sessions,
-      initialPeers,
-      initialSessions,
-      initialConclusions,
-    };
-  });
-  if (workspaceDataResult.errorElement) {
-    return workspaceDataResult.errorElement;
+  if (workspacePageDataResult.errorElement) {
+    return workspacePageDataResult.errorElement;
   }
 
   const {
+    workspace,
     stats,
     peers,
     sessions,
     initialPeers,
     initialSessions,
     initialConclusions,
-  } = workspaceDataResult.data;
+    initialQuery,
+  } = workspacePageDataResult.data;
+
+  const encodedWorkspaceId = encodeURIComponent(workspaceId);
+  const base = `/workspaces/${encodedWorkspaceId}`;
 
   return (
     <div className="space-y-6">
@@ -188,13 +98,7 @@ export default async function WorkspaceDetailPage({
             workspaceId={workspaceId}
             peerIds={peers.map((peer) => peer.id)}
             sessionIds={sessions.map((session) => session.id)}
-            initialQuery={{
-              page,
-              reverse,
-              observerId,
-              observedId,
-              sessionId,
-            }}
+            initialQuery={initialQuery}
             initialConclusions={initialConclusions}
           />
         </div>
