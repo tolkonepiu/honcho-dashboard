@@ -40,7 +40,7 @@ const messagesQuerySchema = z.object({
   page: pageQueryField,
   size: sizeQueryField,
   reverse: reverseQueryField,
-  filters: z.union([messageFiltersQuerySchema, z.undefined()]),
+  filters: messageFiltersQuerySchema.optional(),
 });
 
 type RouteContext = {
