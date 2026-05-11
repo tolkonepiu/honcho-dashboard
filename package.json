@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@catppuccin/tailwindcss": "1.0.0",
-    "@tailwindcss/postcss": "4.2.4",
+    "@tailwindcss/postcss": "4.3.0",
     "@trivago/prettier-plugin-sort-imports": "6.0.2",
     "@types/node": "25.6.2",
     "@types/react": "19.2.14",
@@ -35,7 +35,7 @@
     "eslint-plugin-prettier": "5.5.5",
     "prettier": "3.8.3",
     "prettier-plugin-tailwindcss": "0.8.0",
-    "tailwindcss": "4.2.4",
+    "tailwindcss": "4.3.0",
     "typescript": "6.0.3"
   }
 }
