@@ -29,17 +29,17 @@ export function usePaginatedFetch<TData>({
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [refreshNonce, setRefreshNonce] = useState(0);
-  const isFirstRender = useRef(true);
-  const requestId = useRef(0);
+  const isFirstRenderRef = useRef(true);
+  const requestIdRef = useRef(0);
 
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
+    if (isFirstRenderRef.current) {
+      isFirstRenderRef.current = false;
       return;
     }
 
-    const currentRequestId = requestId.current + 1;
-    requestId.current = currentRequestId;
+    const currentRequestId = requestIdRef.current + 1;
+    requestIdRef.current = currentRequestId;
     const abortController = new AbortController();
 
     const runFetch = async () => {
@@ -61,7 +61,7 @@ export function usePaginatedFetch<TData>({
         }
 
         const data = (await response.json()) as TData;
-        if (requestId.current !== currentRequestId) {
+        if (requestIdRef.current !== currentRequestId) {
           return;
         }
 
@@ -70,7 +70,7 @@ export function usePaginatedFetch<TData>({
       } catch (fetchError) {
         if (
           abortController.signal.aborted ||
-          requestId.current !== currentRequestId
+          requestIdRef.current !== currentRequestId
         ) {
           return;
         }
@@ -81,7 +81,7 @@ export function usePaginatedFetch<TData>({
             : `Failed to load ${entityName}.`;
         setError(message);
       } finally {
-        if (requestId.current === currentRequestId) {
+        if (requestIdRef.current === currentRequestId) {
           setIsPending(false);
         }
       }
