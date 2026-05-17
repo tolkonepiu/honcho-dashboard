@@ -1,5 +1,6 @@
 "use client";
 
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import type { BreadcrumbItem } from "@/components/ui/breadcrumbs";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import Link from "next/link";
@@ -47,9 +48,10 @@ export function DashboardShell({
               <span className="truncate">Honcho Dashboard</span>
             </Link>
 
-            {headerActions ? (
-              <div className="ml-auto shrink-0">{headerActions}</div>
-            ) : null}
+            <div className="ml-auto flex shrink-0 items-center gap-2">
+              {headerActions}
+              <ThemeToggle />
+            </div>
           </div>
 
           <div className="flex min-h-11 items-center border-t border-[var(--pixel-border)] py-2">
