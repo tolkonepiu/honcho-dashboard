@@ -2,7 +2,7 @@ import { cn } from "@/lib/cn";
 
 type TableRefreshButtonProps = {
   isPending: boolean;
-  onRefresh: () => void;
+  onRefresh: () => Promise<void> | void;
   label: string;
 };
 
@@ -59,7 +59,9 @@ export function TableRefreshButton({
   return (
     <button
       type="button"
-      onClick={onRefresh}
+      onClick={() => {
+        void onRefresh();
+      }}
       disabled={isPending}
       className={refreshButtonClass}
       aria-label={label}

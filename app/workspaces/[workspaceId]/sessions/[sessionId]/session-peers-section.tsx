@@ -85,9 +85,7 @@ export function SessionPeersSection({
     }
   }, [isPending, sessionId, workspaceId]);
 
-  usePageRefreshSignal(() => {
-    void refreshPeers();
-  });
+  usePageRefreshSignal(refreshPeers);
 
   const peersBasePath = `/workspaces/${encodeURIComponent(workspaceId)}/peers`;
 

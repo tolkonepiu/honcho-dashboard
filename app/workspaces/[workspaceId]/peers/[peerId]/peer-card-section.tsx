@@ -148,9 +148,7 @@ export function PeerCardSection({
     }
   }, [draftCardText, isBusy, isEditing, peerId, workspaceId]);
 
-  usePageRefreshSignal(() => {
-    void refreshCard();
-  });
+  usePageRefreshSignal(refreshCard);
 
   useEffect(() => {
     if (!isEditing || !cardTextareaRef.current) {
