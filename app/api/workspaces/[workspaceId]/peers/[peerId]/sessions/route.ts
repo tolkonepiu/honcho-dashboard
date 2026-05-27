@@ -1,5 +1,5 @@
 import {
-  paginationQuerySchema,
+  listQuerySchema,
   peerSessionsRouteParamsSchema,
   type PeerRouteContext,
 } from "@/lib/api-schemas";
@@ -14,9 +14,10 @@ export const GET = routeHandler(
       await params,
       peerSessionsRouteParamsSchema,
     );
-    const { page, size } = parseApiQuery(request, paginationQuerySchema);
+    const { page, reverse, size } = parseApiQuery(request, listQuerySchema);
     const sessions = await listPeerSessionsPaginated(workspaceId, peerId, {
       page,
+      reverse,
       size,
     });
 

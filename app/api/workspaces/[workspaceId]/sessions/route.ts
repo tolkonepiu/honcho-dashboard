@@ -1,5 +1,5 @@
 import {
-  paginationQuerySchema,
+  listQuerySchema,
   type WorkspaceRouteContext,
   workspaceRouteParamsSchema,
 } from "@/lib/api-schemas";
@@ -14,8 +14,12 @@ export const GET = routeHandler(
       await params,
       workspaceRouteParamsSchema,
     );
-    const { page, size } = parseApiQuery(request, paginationQuerySchema);
-    const sessions = await listSessionsPaginated(workspaceId, { page, size });
+    const { page, reverse, size } = parseApiQuery(request, listQuerySchema);
+    const sessions = await listSessionsPaginated(workspaceId, {
+      page,
+      reverse,
+      size,
+    });
 
     return Response.json(sessions);
   },

@@ -1,4 +1,11 @@
-import { paginationQuerySchema } from "@/lib/api-schemas";
+import {
+  conclusionListOptionsSchema,
+  countProbePaginationSchema,
+  type ListOptions,
+  listOptionsSchema,
+  messageListOptionsSchema,
+  paginationQuerySchema,
+} from "@/lib/api-schemas";
 import type {
   ConclusionFilters,
   DashboardConclusion,
@@ -20,40 +27,8 @@ import type {
 } from "@honcho-ai/sdk";
 import { Honcho, type Session } from "@honcho-ai/sdk";
 import "server-only";
-import { z } from "zod";
 
 const API_PREFIX = "/v3";
-
-type PaginationOptions = {
-  page?: number;
-  size?: number;
-};
-
-const honchoPaginationSchema = paginationQuerySchema;
-
-const honchoListOptionsSchema = paginationQuerySchema.extend({
-  reverse: z.boolean().default(false),
-});
-
-const filtersSchema = z.record(z.string(), z.unknown());
-
-const messageListOptionsSchema = honchoListOptionsSchema.extend({
-  filters: filtersSchema.optional(),
-});
-
-const conclusionListOptionsSchema = honchoListOptionsSchema.extend({
-  filters: z
-    .object({
-      observer_id: z.string().optional(),
-      observed_id: z.string().optional(),
-      session_id: z.string().optional(),
-    })
-    .optional(),
-});
-
-const countProbePaginationSchema = paginationQuerySchema.extend({
-  size: z.literal(1),
-});
 
 function workspacePath(workspaceId: string): string {
   return `${API_PREFIX}/workspaces/${encodeURIComponent(workspaceId)}`;
@@ -200,7 +175,7 @@ async function fetchAllPages<T>(
   fetchPage: (page: number, size: number) => Promise<PageResponse<T>>,
 ): Promise<T[]> {
   const items: T[] = [];
-  const pagination = honchoPaginationSchema.parse({});
+  const pagination = paginationQuerySchema.parse({});
   let pageNumber = pagination.page;
   let totalPages = 1;
 
@@ -246,13 +221,13 @@ export async function listWorkspaces(): Promise<DashboardWorkspace[]> {
 }
 
 export async function listWorkspacesPaginated(
-  options: PaginationOptions = {},
+  options: ListOptions = {},
 ): Promise<PaginatedResult<DashboardWorkspace>> {
-  const { page, size } = honchoPaginationSchema.parse(options);
+  const { page, reverse, size } = listOptionsSchema.parse(options);
   const client = createClient();
   const response = await runHonchoRequest(() =>
     pagePost<WorkspaceResponse>(client, `${API_PREFIX}/workspaces/list`, {
-      query: { page, size },
+      query: { page, reverse: reverse ? "true" : undefined, size },
     }),
   );
 
@@ -260,7 +235,7 @@ export async function listWorkspacesPaginated(
 }
 
 export async function listWorkspaceTableRowsPaginated(
-  options: PaginationOptions = {},
+  options: ListOptions = {},
 ): Promise<PaginatedResult<DashboardWorkspaceTableRow>> {
   const pageResult = await listWorkspacesPaginated(options);
   const items = await Promise.all(
@@ -298,11 +273,13 @@ export async function listPeers(workspaceId: string): Promise<DashboardPeer[]> {
 
 export async function listPeersPaginated(
   workspaceId: string,
-  options: PaginationOptions = {},
+  options: ListOptions = {},
 ): Promise<PaginatedResult<DashboardPeer>> {
-  const { page, size } = honchoPaginationSchema.parse(options);
+  const { page, reverse, size } = listOptionsSchema.parse(options);
   const client = createClient(workspaceId);
-  const response = await runHonchoRequest(() => client.peers({ page, size }));
+  const response = await runHonchoRequest(() =>
+    client.peers({ page, reverse, size }),
+  );
 
   return buildPaginatedResult(response, serializePeer);
 }
@@ -330,12 +307,12 @@ export async function listSessions(
 
 export async function listSessionsPaginated(
   workspaceId: string,
-  options: PaginationOptions = {},
+  options: ListOptions = {},
 ): Promise<PaginatedResult<DashboardSession>> {
-  const { page, size } = honchoPaginationSchema.parse(options);
+  const { page, reverse, size } = listOptionsSchema.parse(options);
   const client = createClient(workspaceId);
   const sessionsPage = await runHonchoRequest(() =>
-    client.sessions({ page, size }),
+    client.sessions({ page, reverse, size }),
   );
 
   return buildPaginatedResult(sessionsPage, serializeSession);
@@ -356,12 +333,14 @@ export async function listPeerSessions(
 export async function listPeerSessionsPaginated(
   workspaceId: string,
   peerId: string,
-  options: PaginationOptions = {},
+  options: ListOptions = {},
 ): Promise<PaginatedResult<DashboardSession>> {
-  const { page, size } = honchoPaginationSchema.parse(options);
+  const { page, reverse, size } = listOptionsSchema.parse(options);
   const client = createClient(workspaceId);
   const peer = await runHonchoRequest(() => client.peer(peerId));
-  const response = await runHonchoRequest(() => peer.sessions({ page, size }));
+  const response = await runHonchoRequest(() =>
+    peer.sessions({ page, reverse, size }),
+  );
 
   return buildPaginatedResult(response, serializeSession);
 }

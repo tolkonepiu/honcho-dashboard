@@ -15,6 +15,8 @@ export const sizeQueryField = z.coerce
 
 export const reverseQueryField = z.stringbool().default(false);
 
+export const reverseOptionField = z.boolean().default(false);
+
 export const paginationQuerySchema = z.object({
   page: pageQueryField,
   size: sizeQueryField,
@@ -23,6 +25,32 @@ export const paginationQuerySchema = z.object({
 export const listQuerySchema = paginationQuerySchema.extend({
   reverse: reverseQueryField,
 });
+
+export const listOptionsSchema = paginationQuerySchema.extend({
+  reverse: reverseOptionField,
+});
+
+export const countProbePaginationSchema = paginationQuerySchema.extend({
+  size: z.literal(1),
+});
+
+export const filtersSchema = z.record(z.string(), z.unknown());
+
+export const messageListOptionsSchema = listOptionsSchema.extend({
+  filters: filtersSchema.optional(),
+});
+
+export const conclusionListOptionsSchema = listOptionsSchema.extend({
+  filters: z
+    .object({
+      observer_id: z.string().optional(),
+      observed_id: z.string().optional(),
+      session_id: z.string().optional(),
+    })
+    .optional(),
+});
+
+export type ListOptions = z.input<typeof listOptionsSchema>;
 
 export const workspaceRouteParamsSchema = z.object({
   workspaceId: nonEmptyStringField,
