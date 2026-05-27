@@ -5,18 +5,12 @@ import { JsonCell } from "@/components/ui/json-cell";
 import { PaginatedTableShell } from "@/components/ui/paginated-table-shell";
 import { RelativeTime } from "@/components/ui/relative-time";
 import { usePaginatedTable } from "@/hooks/use-paginated-table";
+import type { DashboardPeer, PaginatedResult } from "@/lib/dashboard-types";
 import Link from "next/link";
-
-type PeerRow = {
-  id: string;
-  createdAt: string;
-  metadata: Record<string, unknown>;
-  configuration: Record<string, unknown>;
-};
 
 type PeersSectionProps = {
   workspaceId: string;
-  initialPeers: PaginatedPeersData;
+  initialPeers: PaginatedResult<DashboardPeer>;
   peersApiPath?: string;
   peersBasePath?: string;
   title?: string;
@@ -24,14 +18,6 @@ type PeersSectionProps = {
   emptyStateTitle?: string;
   emptyStateDescription?: string;
   showMetadataColumns?: boolean;
-};
-
-type PaginatedPeersData = {
-  items: PeerRow[];
-  page: number;
-  pages: number;
-  size: number;
-  total: number;
 };
 
 export function PeersSection({
@@ -54,7 +40,7 @@ export function PeersSection({
   const resolvedEmptyStateDescription =
     emptyStateDescription ?? "This workspace has no peers yet.";
   const { data, query, pageSize, pagination, isPending, error, refresh } =
-    usePaginatedTable<PeerRow, PaginatedPeersData>({
+    usePaginatedTable<DashboardPeer, typeof initialPeers>({
       initialData: initialPeers,
       apiPath: resolvedPeersApiPath,
       entityName: "peers",

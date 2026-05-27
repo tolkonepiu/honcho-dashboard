@@ -1,113 +1,62 @@
+import { paginationQuerySchema } from "@/lib/api-schemas";
+import type {
+  ConclusionFilters,
+  DashboardConclusion,
+  DashboardMessage,
+  DashboardPeer,
+  DashboardSession,
+  DashboardWorkspace,
+  DashboardWorkspaceTableRow,
+  PaginatedResult,
+  WorkspaceStats,
+} from "@/lib/dashboard-types";
 import { HonchoAppError, normalizeHonchoError } from "@/lib/honcho-errors";
 import type {
   ConclusionResponse,
-  MessageResponse,
+  Message,
   PageResponse,
-  PeerResponse,
-  SessionResponse,
+  Peer,
   WorkspaceResponse,
 } from "@honcho-ai/sdk";
 import { Honcho, type Session } from "@honcho-ai/sdk";
 import "server-only";
+import { z } from "zod";
 
 const API_PREFIX = "/v3";
-const PAGE_SIZE = 100;
-const MAX_LIST_PAGE_SIZE = 100;
-
-export type DashboardPeer = {
-  id: string;
-  workspaceId: string;
-  metadata: Record<string, unknown>;
-  configuration: Record<string, unknown>;
-  createdAt: string;
-};
-
-export type DashboardWorkspace = {
-  id: string;
-  metadata: Record<string, unknown>;
-  configuration: WorkspaceResponse["configuration"];
-  createdAt: string;
-};
-
-export type DashboardWorkspaceTableRow = DashboardWorkspace & {
-  peerCount: number;
-  sessionCount: number;
-};
-
-export type DashboardSession = {
-  id: string;
-  workspaceId: string;
-  isActive: boolean;
-  metadata: Record<string, unknown>;
-  configuration: SessionResponse["configuration"];
-  createdAt: string;
-};
-
-export type DashboardMessage = {
-  id: string;
-  content: string;
-  peerId: string;
-  sessionId: string;
-  workspaceId: string;
-  metadata: Record<string, unknown>;
-  createdAt: string;
-  tokenCount: number;
-};
-
-export type DashboardConclusion = {
-  id: string;
-  content: string;
-  observerId: string;
-  observedId: string;
-  sessionId: string | null;
-  createdAt: string;
-};
-
-export type PaginatedResult<T> = {
-  items: T[];
-  page: number;
-  pages: number;
-  size: number;
-  total: number;
-};
-
-export type WorkspaceStats = {
-  peerCount: number;
-  sessionCount: number;
-  conclusionCount: number;
-};
-
-export type ConclusionFilters = {
-  observer_id?: string;
-  observed_id?: string;
-  session_id?: string;
-};
-
-const MAX_CONCLUSION_PAGE_SIZE = 50;
 
 type PaginationOptions = {
   page?: number;
   size?: number;
 };
 
+const honchoPaginationSchema = paginationQuerySchema;
+
+const honchoListOptionsSchema = paginationQuerySchema.extend({
+  reverse: z.boolean().default(false),
+});
+
+const filtersSchema = z.record(z.string(), z.unknown());
+
+const messageListOptionsSchema = honchoListOptionsSchema.extend({
+  filters: filtersSchema.optional(),
+});
+
+const conclusionListOptionsSchema = honchoListOptionsSchema.extend({
+  filters: z
+    .object({
+      observer_id: z.string().optional(),
+      observed_id: z.string().optional(),
+      session_id: z.string().optional(),
+    })
+    .optional(),
+});
+
+const countProbePaginationSchema = paginationQuerySchema.extend({
+  size: z.literal(1),
+});
+
 function workspacePath(workspaceId: string): string {
   return `${API_PREFIX}/workspaces/${encodeURIComponent(workspaceId)}`;
-}
-
-function peersPath(workspaceId: string): string {
-  return `${workspacePath(workspaceId)}/peers`;
-}
-
-function peerPath(workspaceId: string, peerId: string): string {
-  return `${peersPath(workspaceId)}/${encodeURIComponent(peerId)}`;
-}
-
-function sessionsPath(workspaceId: string): string {
-  return `${workspacePath(workspaceId)}/sessions`;
-}
-
-function sessionPath(workspaceId: string, sessionId: string): string {
-  return `${sessionsPath(workspaceId)}/${encodeURIComponent(sessionId)}`;
 }
 
 function conclusionsPath(workspaceId: string): string {
@@ -158,30 +107,27 @@ async function runHonchoRequest<T>(operation: () => Promise<T>): Promise<T> {
   }
 }
 
-function mapPeer(response: PeerResponse): DashboardPeer {
+function serializePeer(peer: Peer): DashboardPeer {
+  const metadata = requireSdkField(peer.metadata, "peer", "metadata");
+  const configuration = requireSdkField(
+    peer.configuration,
+    "peer",
+    "configuration",
+  );
+  const createdAt = requireSdkField(peer.createdAt, "peer", "createdAt");
+
   return {
-    id: response.id,
-    workspaceId: response.workspace_id,
-    metadata: response.metadata,
-    configuration: response.configuration,
-    createdAt: response.created_at,
+    id: peer.id,
+    workspaceId: peer.workspaceId,
+    metadata,
+    configuration,
+    createdAt,
   };
 }
 
 function mapWorkspace(response: WorkspaceResponse): DashboardWorkspace {
   return {
     id: response.id,
-    metadata: response.metadata,
-    configuration: response.configuration,
-    createdAt: response.created_at,
-  };
-}
-
-function mapSession(response: SessionResponse): DashboardSession {
-  return {
-    id: response.id,
-    workspaceId: response.workspace_id,
-    isActive: response.is_active,
     metadata: response.metadata,
     configuration: response.configuration,
     createdAt: response.created_at,
@@ -204,71 +150,7 @@ function requireSdkField<T>(
   return value;
 }
 
-function mapSessionConfigurationToApi(
-  configuration: NonNullable<Session["configuration"]>,
-): SessionResponse["configuration"] {
-  return {
-    ...(configuration.reasoning
-      ? {
-          reasoning: {
-            ...(Object.hasOwn(configuration.reasoning, "enabled")
-              ? { enabled: configuration.reasoning.enabled }
-              : {}),
-            ...(Object.hasOwn(configuration.reasoning, "customInstructions")
-              ? {
-                  custom_instructions:
-                    configuration.reasoning.customInstructions,
-                }
-              : {}),
-          },
-        }
-      : {}),
-    ...(configuration.peerCard
-      ? {
-          peer_card: {
-            ...(Object.hasOwn(configuration.peerCard, "use")
-              ? { use: configuration.peerCard.use }
-              : {}),
-            ...(Object.hasOwn(configuration.peerCard, "create")
-              ? { create: configuration.peerCard.create }
-              : {}),
-          },
-        }
-      : {}),
-    ...(configuration.summary
-      ? {
-          summary: {
-            ...(Object.hasOwn(configuration.summary, "enabled")
-              ? { enabled: configuration.summary.enabled }
-              : {}),
-            ...(Object.hasOwn(configuration.summary, "messagesPerShortSummary")
-              ? {
-                  messages_per_short_summary:
-                    configuration.summary.messagesPerShortSummary,
-                }
-              : {}),
-            ...(Object.hasOwn(configuration.summary, "messagesPerLongSummary")
-              ? {
-                  messages_per_long_summary:
-                    configuration.summary.messagesPerLongSummary,
-                }
-              : {}),
-          },
-        }
-      : {}),
-    ...(configuration.dream
-      ? {
-          dream: {
-            ...(Object.hasOwn(configuration.dream, "enabled")
-              ? { enabled: configuration.dream.enabled }
-              : {}),
-          },
-        }
-      : {}),
-  };
-}
-
-function mapSdkSession(session: Session): DashboardSession {
+function serializeSession(session: Session): DashboardSession {
   const isActive = requireSdkField(session.isActive, "session", "isActive");
   const metadata = requireSdkField(session.metadata, "session", "metadata");
   const configuration = requireSdkField(
@@ -283,25 +165,27 @@ function mapSdkSession(session: Session): DashboardSession {
     workspaceId: session.workspaceId,
     isActive,
     metadata,
-    configuration: mapSessionConfigurationToApi(configuration),
+    configuration,
     createdAt,
   };
 }
 
-function mapMessage(response: MessageResponse): DashboardMessage {
+function serializeMessage(message: Message): DashboardMessage {
   return {
-    id: response.id,
-    content: response.content,
-    peerId: response.peer_id,
-    sessionId: response.session_id,
-    workspaceId: response.workspace_id,
-    metadata: response.metadata,
-    createdAt: response.created_at,
-    tokenCount: response.token_count,
+    id: message.id,
+    content: message.content,
+    peerId: message.peerId,
+    sessionId: message.sessionId,
+    workspaceId: message.workspaceId,
+    metadata: message.metadata,
+    createdAt: message.createdAt,
+    tokenCount: message.tokenCount,
   };
 }
 
-function mapConclusion(response: ConclusionResponse): DashboardConclusion {
+function serializeConclusionResponse(
+  response: ConclusionResponse,
+): DashboardConclusion {
   return {
     id: response.id,
     content: response.content,
@@ -316,12 +200,13 @@ async function fetchAllPages<T>(
   fetchPage: (page: number, size: number) => Promise<PageResponse<T>>,
 ): Promise<T[]> {
   const items: T[] = [];
-  let pageNumber = 1;
+  const pagination = honchoPaginationSchema.parse({});
+  let pageNumber = pagination.page;
   let totalPages = 1;
 
   while (pageNumber <= totalPages) {
     const response = await runHonchoRequest(() =>
-      fetchPage(pageNumber, PAGE_SIZE),
+      fetchPage(pageNumber, pagination.size),
     );
     items.push(...response.items);
 
@@ -336,34 +221,17 @@ async function fetchAllPages<T>(
   return items;
 }
 
-function resolvePage(page: number | undefined) {
-  if (!page || !Number.isFinite(page) || page < 1) {
-    return 1;
-  }
-
-  return Math.floor(page);
-}
-
 function buildPaginatedResult<TRaw, TMapped>(
   response: PageResponse<TRaw>,
   mapper: (item: TRaw) => TMapped,
-  overrides?: { page?: number; size?: number },
 ): PaginatedResult<TMapped> {
   return {
     items: response.items.map(mapper),
-    page: overrides?.page ?? response.page,
+    page: response.page,
     pages: response.pages,
-    size: overrides?.size ?? response.size,
+    size: response.size,
     total: response.total,
   };
-}
-
-function resolvePageSize(size: number | undefined, maxSize: number) {
-  if (!size || !Number.isFinite(size) || size < 1) {
-    return 10;
-  }
-
-  return Math.min(maxSize, Math.floor(size));
 }
 
 export async function listWorkspaces(): Promise<DashboardWorkspace[]> {
@@ -380,8 +248,7 @@ export async function listWorkspaces(): Promise<DashboardWorkspace[]> {
 export async function listWorkspacesPaginated(
   options: PaginationOptions = {},
 ): Promise<PaginatedResult<DashboardWorkspace>> {
-  const page = resolvePage(options.page);
-  const size = resolvePageSize(options.size, MAX_LIST_PAGE_SIZE);
+  const { page, size } = honchoPaginationSchema.parse(options);
   const client = createClient();
   const response = await runHonchoRequest(() =>
     pagePost<WorkspaceResponse>(client, `${API_PREFIX}/workspaces/list`, {
@@ -389,7 +256,7 @@ export async function listWorkspacesPaginated(
     }),
   );
 
-  return buildPaginatedResult(response, mapWorkspace, { page, size });
+  return buildPaginatedResult(response, mapWorkspace);
 }
 
 export async function listWorkspaceTableRowsPaginated(
@@ -423,29 +290,21 @@ export async function getWorkspace(
 
 export async function listPeers(workspaceId: string): Promise<DashboardPeer[]> {
   const client = createClient(workspaceId);
-  const items = await fetchAllPages<PeerResponse>((page, size) =>
-    pagePost<PeerResponse>(client, `${peersPath(workspaceId)}/list`, {
-      query: { page, size },
-    }),
-  );
+  const peers = await runHonchoRequest(() => client.peers());
+  const items = await runHonchoRequest(() => peers.toArray());
 
-  return items.map(mapPeer);
+  return items.map(serializePeer);
 }
 
 export async function listPeersPaginated(
   workspaceId: string,
   options: PaginationOptions = {},
 ): Promise<PaginatedResult<DashboardPeer>> {
-  const page = resolvePage(options.page);
-  const size = resolvePageSize(options.size, MAX_LIST_PAGE_SIZE);
+  const { page, size } = honchoPaginationSchema.parse(options);
   const client = createClient(workspaceId);
-  const response = await runHonchoRequest(() =>
-    pagePost<PeerResponse>(client, `${peersPath(workspaceId)}/list`, {
-      query: { page, size },
-    }),
-  );
+  const response = await runHonchoRequest(() => client.peers({ page, size }));
 
-  return buildPaginatedResult(response, mapPeer, { page, size });
+  return buildPaginatedResult(response, serializePeer);
 }
 
 export async function getPeer(
@@ -464,25 +323,22 @@ export async function listSessions(
   workspaceId: string,
 ): Promise<DashboardSession[]> {
   const client = createClient(workspaceId);
-  const sessions = await runHonchoRequest(() =>
-    client.sessions({ size: PAGE_SIZE }),
-  );
+  const sessions = await runHonchoRequest(() => client.sessions());
   const all = await runHonchoRequest(() => sessions.toArray());
-  return all.map(mapSdkSession);
+  return all.map(serializeSession);
 }
 
 export async function listSessionsPaginated(
   workspaceId: string,
   options: PaginationOptions = {},
 ): Promise<PaginatedResult<DashboardSession>> {
-  const page = resolvePage(options.page);
-  const size = resolvePageSize(options.size, MAX_LIST_PAGE_SIZE);
+  const { page, size } = honchoPaginationSchema.parse(options);
   const client = createClient(workspaceId);
   const sessionsPage = await runHonchoRequest(() =>
     client.sessions({ page, size }),
   );
 
-  return buildPaginatedResult(sessionsPage, mapSdkSession);
+  return buildPaginatedResult(sessionsPage, serializeSession);
 }
 
 export async function listPeerSessions(
@@ -490,17 +346,11 @@ export async function listPeerSessions(
   peerId: string,
 ): Promise<DashboardSession[]> {
   const client = createClient(workspaceId);
-  const items = await fetchAllPages<SessionResponse>((page, size) =>
-    pagePost<SessionResponse>(
-      client,
-      `${peerPath(workspaceId, peerId)}/sessions`,
-      {
-        query: { page, size },
-      },
-    ),
-  );
+  const peer = await runHonchoRequest(() => client.peer(peerId));
+  const sessions = await runHonchoRequest(() => peer.sessions());
+  const items = await runHonchoRequest(() => sessions.toArray());
 
-  return items.map(mapSession);
+  return items.map(serializeSession);
 }
 
 export async function listPeerSessionsPaginated(
@@ -508,18 +358,12 @@ export async function listPeerSessionsPaginated(
   peerId: string,
   options: PaginationOptions = {},
 ): Promise<PaginatedResult<DashboardSession>> {
-  const page = resolvePage(options.page);
-  const size = resolvePageSize(options.size, MAX_LIST_PAGE_SIZE);
+  const { page, size } = honchoPaginationSchema.parse(options);
   const client = createClient(workspaceId);
-  const response = await runHonchoRequest(() =>
-    pagePost<SessionResponse>(
-      client,
-      `${peerPath(workspaceId, peerId)}/sessions`,
-      { query: { page, size } },
-    ),
-  );
+  const peer = await runHonchoRequest(() => client.peer(peerId));
+  const response = await runHonchoRequest(() => peer.sessions({ page, size }));
 
-  return buildPaginatedResult(response, mapSession, { page, size });
+  return buildPaginatedResult(response, serializeSession);
 }
 
 export async function getPeerCard(
@@ -527,13 +371,9 @@ export async function getPeerCard(
   peerId: string,
 ): Promise<string[] | null> {
   const client = createClient(workspaceId);
-  const response = await runHonchoRequest(() =>
-    client.http.get<{ peer_card: string[] | null }>(
-      `${peerPath(workspaceId, peerId)}/card`,
-    ),
-  );
+  const peer = await runHonchoRequest(() => client.peer(peerId));
 
-  return response.peer_card;
+  return runHonchoRequest(() => peer.getCard());
 }
 
 export async function setPeerCard(
@@ -542,16 +382,9 @@ export async function setPeerCard(
   peerCard: string[] | null,
 ): Promise<string[] | null> {
   const client = createClient(workspaceId);
-  const response = await runHonchoRequest(() =>
-    client.http.put<{ peer_card: string[] | null }>(
-      `${peerPath(workspaceId, peerId)}/card`,
-      {
-        body: { peer_card: peerCard },
-      },
-    ),
-  );
+  const peer = await runHonchoRequest(() => client.peer(peerId));
 
-  return response.peer_card;
+  return runHonchoRequest(() => peer.setCard(peerCard ?? []));
 }
 
 export async function getSession(
@@ -570,31 +403,15 @@ export async function listMessages(
   workspaceId: string,
   sessionId: string,
 ): Promise<DashboardMessage[]> {
-  if (!(await getSession(workspaceId, sessionId))) {
-    throw new HonchoAppError(
-      `Session ${sessionId} was not found in workspace ${workspaceId}.`,
-      404,
-      "honcho_session_not_found",
-    );
-  }
-
   const client = createClient(workspaceId);
-  const items = await fetchAllPages<MessageResponse>((page, size) =>
-    pagePost<MessageResponse>(
-      client,
-      `${sessionPath(workspaceId, sessionId)}/messages/list`,
-      {
-        query: { page, size },
-      },
-    ),
-  );
+  const session = await runHonchoRequest(() => client.session(sessionId));
+  const messages = await runHonchoRequest(() => session.messages());
+  const items = await runHonchoRequest(() => messages.toArray());
 
-  return items.map(mapMessage);
+  return items.map(serializeMessage);
 }
 
 export type MessageFilters = Record<string, unknown>;
-
-const MAX_MESSAGE_PAGE_SIZE = 100;
 
 export async function listMessagesPaginated(
   workspaceId: string,
@@ -606,50 +423,32 @@ export async function listMessagesPaginated(
     filters?: MessageFilters;
   } = {},
 ): Promise<PaginatedResult<DashboardMessage>> {
-  const page = resolvePage(options.page);
-  const size = resolvePageSize(options.size, MAX_MESSAGE_PAGE_SIZE);
-  const reverse = options.reverse ?? false;
-
-  const body: Record<string, unknown> = {};
-  if (options.filters && Object.keys(options.filters).length > 0) {
-    body.filters = options.filters;
-  }
+  const { filters, page, size, reverse } =
+    messageListOptionsSchema.parse(options);
 
   const client = createClient(workspaceId);
+  const session = await runHonchoRequest(() => client.session(sessionId));
   const response = await runHonchoRequest(() =>
-    pagePost<MessageResponse>(
-      client,
-      `${sessionPath(workspaceId, sessionId)}/messages/list`,
-      {
-        body,
-        query: { page, size, reverse: reverse ? "true" : undefined },
-      },
-    ),
+    session.messages({
+      page,
+      size,
+      reverse,
+      ...(filters && Object.keys(filters).length > 0 ? { filters } : {}),
+    }),
   );
 
-  return buildPaginatedResult(response, mapMessage, { page, size });
+  return buildPaginatedResult(response, serializeMessage);
 }
 
 export async function getSessionPeers(
   workspaceId: string,
   sessionId: string,
 ): Promise<DashboardPeer[]> {
-  if (!(await getSession(workspaceId, sessionId))) {
-    throw new HonchoAppError(
-      `Session ${sessionId} was not found in workspace ${workspaceId}.`,
-      404,
-      "honcho_session_not_found",
-    );
-  }
-
   const client = createClient(workspaceId);
-  const peersPage = await runHonchoRequest(() =>
-    client.http.get<PageResponse<PeerResponse>>(
-      `${sessionPath(workspaceId, sessionId)}/peers`,
-    ),
-  );
+  const session = await runHonchoRequest(() => client.session(sessionId));
+  const peers = await runHonchoRequest(() => session.peers());
 
-  return peersPage.items.map(mapPeer);
+  return peers.map(serializePeer);
 }
 
 export async function listConclusions(
@@ -661,20 +460,12 @@ export async function listConclusions(
     filters?: ConclusionFilters;
   } = {},
 ): Promise<PaginatedResult<DashboardConclusion>> {
-  const page = Math.max(1, options.page ?? 1);
-  const size = Math.min(
-    MAX_CONCLUSION_PAGE_SIZE,
-    Math.max(1, options.size ?? 20),
-  );
-  const reverse = options.reverse ?? false;
-
+  const { filters, page, size, reverse } =
+    conclusionListOptionsSchema.parse(options);
   const bodyFilters: Record<string, unknown> = {};
-  if (options.filters?.observer_id)
-    bodyFilters.observer_id = options.filters.observer_id;
-  if (options.filters?.observed_id)
-    bodyFilters.observed_id = options.filters.observed_id;
-  if (options.filters?.session_id)
-    bodyFilters.session_id = options.filters.session_id;
+  if (filters?.observer_id) bodyFilters.observer_id = filters.observer_id;
+  if (filters?.observed_id) bodyFilters.observed_id = filters.observed_id;
+  if (filters?.session_id) bodyFilters.session_id = filters.session_id;
 
   const client = createClient(workspaceId);
   const response = await runHonchoRequest(() =>
@@ -691,27 +482,24 @@ export async function listConclusions(
     ),
   );
 
-  return buildPaginatedResult(response, mapConclusion, { page, size });
+  return buildPaginatedResult(response, serializeConclusionResponse);
 }
 
 export async function getWorkspaceStats(
   workspaceId: string,
 ): Promise<WorkspaceStats> {
   const client = createClient(workspaceId);
+  const countProbePagination = countProbePaginationSchema.parse({ size: 1 });
 
   const [peersPage, sessionsPage, conclusionsPage] = await runHonchoRequest(
     () =>
       Promise.all([
-        pagePost<PeerResponse>(client, `${peersPath(workspaceId)}/list`, {
-          query: { page: 1, size: 1 },
-        }),
-        pagePost<SessionResponse>(client, `${sessionsPath(workspaceId)}/list`, {
-          query: { page: 1, size: 1 },
-        }),
+        client.peers(countProbePagination),
+        client.sessions(countProbePagination),
         pagePost<ConclusionResponse>(
           client,
           `${conclusionsPath(workspaceId)}/list`,
-          { query: { page: 1, size: 1 } },
+          { query: countProbePagination },
         ),
       ]),
   );
@@ -725,7 +513,7 @@ export async function getWorkspaceStats(
 
 export async function deleteWorkspace(workspaceId: string): Promise<void> {
   const client = createClient();
-  await runHonchoRequest(() => client.http.delete(workspacePath(workspaceId)));
+  await runHonchoRequest(() => client.deleteWorkspace(workspaceId));
 }
 
 export async function deleteSession(
@@ -733,9 +521,8 @@ export async function deleteSession(
   sessionId: string,
 ): Promise<void> {
   const client = createClient(workspaceId);
-  await runHonchoRequest(() =>
-    client.http.delete(sessionPath(workspaceId, sessionId)),
-  );
+  const session = await runHonchoRequest(() => client.session(sessionId));
+  await runHonchoRequest(() => session.delete());
 }
 
 export async function deleteConclusion(

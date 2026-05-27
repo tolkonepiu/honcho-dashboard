@@ -3,7 +3,6 @@
 import { EmptyState } from "@/components/ui/empty-state";
 import { Surface } from "@/components/ui/surface";
 import { TableRefreshButton } from "@/components/ui/table-controls";
-import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
 import { getApiErrorMessage } from "@/lib/api-client";
 import { cn } from "@/lib/cn";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -147,8 +146,6 @@ export function PeerCardSection({
       setIsSaving(false);
     }
   }, [draftCardText, isBusy, isEditing, peerId, workspaceId]);
-
-  usePageRefreshSignal(refreshCard);
 
   useEffect(() => {
     if (!isEditing || !cardTextareaRef.current) {

@@ -5,13 +5,15 @@ import { JsonPanel } from "@/components/ui/json-panel";
 import { PageHeaderActions } from "@/components/ui/page-header-actions";
 import { RelativeTime } from "@/components/ui/relative-time";
 import { StatCard } from "@/components/ui/stat-card";
+import type {
+  DashboardMessage,
+  DashboardPeer,
+  PaginatedResult,
+} from "@/lib/dashboard-types";
 import {
-  type DashboardMessage,
-  type DashboardPeer,
   getSession,
   getSessionPeers,
   listMessagesPaginated,
-  type PaginatedResult,
 } from "@/lib/honcho";
 import { loadHonchoPageData, loadHonchoPageEntity } from "@/lib/page-data";
 import type { Metadata } from "next";
@@ -46,8 +48,6 @@ export default async function SessionDetailPage({ params }: Props) {
   }>(async () => {
     const [initialMessages, initialPeers] = await Promise.all([
       listMessagesPaginated(workspaceId, sessionId, {
-        page: 1,
-        size: 10,
         reverse: true,
       }),
       getSessionPeers(workspaceId, sessionId),
@@ -114,7 +114,6 @@ export default async function SessionDetailPage({ params }: Props) {
         <div className="space-y-6 lg:col-span-1">
           <SessionPeersSection
             workspaceId={workspaceId}
-            sessionId={sessionId}
             initialPeers={initialPeers}
           />
           <JsonPanel title="Metadata" value={session.metadata} />

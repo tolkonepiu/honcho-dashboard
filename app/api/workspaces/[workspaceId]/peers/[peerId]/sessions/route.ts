@@ -1,35 +1,20 @@
 import {
-  nonEmptyStringField,
-  pageQueryField,
-  sizeQueryField,
+  paginationQuerySchema,
+  peerSessionsRouteParamsSchema,
+  type PeerRouteContext,
 } from "@/lib/api-schemas";
 import { parseApiInput, parseApiQuery, routeHandler } from "@/lib/api-utils";
 import { listPeerSessionsPaginated } from "@/lib/honcho";
-import { z } from "zod";
 
 export const dynamic = "force-dynamic";
 
-const peerSessionsRouteParamsSchema = z.object({
-  workspaceId: nonEmptyStringField,
-  peerId: nonEmptyStringField,
-});
-
-const peerSessionsQuerySchema = z.object({
-  page: pageQueryField,
-  size: sizeQueryField,
-});
-
-type RouteContext = {
-  params: Promise<{ workspaceId: string; peerId: string }>;
-};
-
 export const GET = routeHandler(
-  async (request: Request, { params }: RouteContext) => {
+  async (request: Request, { params }: PeerRouteContext) => {
     const { workspaceId, peerId } = parseApiInput(
       await params,
       peerSessionsRouteParamsSchema,
     );
-    const { page, size } = parseApiQuery(request, peerSessionsQuerySchema);
+    const { page, size } = parseApiQuery(request, paginationQuerySchema);
     const sessions = await listPeerSessionsPaginated(workspaceId, peerId, {
       page,
       size,

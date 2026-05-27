@@ -1,10 +1,6 @@
 import { SessionsSection } from "../sessions-section";
-import {
-  type DashboardSession,
-  type PaginatedResult,
-  getWorkspace,
-  listSessionsPaginated,
-} from "@/lib/honcho";
+import type { DashboardSession, PaginatedResult } from "@/lib/dashboard-types";
+import { getWorkspace, listSessionsPaginated } from "@/lib/honcho";
 import { loadHonchoPageData, loadHonchoPageEntity } from "@/lib/page-data";
 import type { Metadata } from "next";
 
@@ -24,12 +20,7 @@ export default async function SessionsPage({ params }: Props) {
 
   const initialSessionsResult = await loadHonchoPageData<
     PaginatedResult<DashboardSession>
-  >(() =>
-    listSessionsPaginated(workspaceId, {
-      page: 1,
-      size: 10,
-    }),
-  );
+  >(() => listSessionsPaginated(workspaceId));
   if (initialSessionsResult.errorElement) {
     return initialSessionsResult.errorElement;
   }

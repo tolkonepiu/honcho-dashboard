@@ -1,10 +1,6 @@
 import { PeersSection } from "../peers-section";
-import {
-  type DashboardPeer,
-  type PaginatedResult,
-  getWorkspace,
-  listPeersPaginated,
-} from "@/lib/honcho";
+import type { DashboardPeer, PaginatedResult } from "@/lib/dashboard-types";
+import { getWorkspace, listPeersPaginated } from "@/lib/honcho";
 import { loadHonchoPageData, loadHonchoPageEntity } from "@/lib/page-data";
 import type { Metadata } from "next";
 
@@ -24,12 +20,7 @@ export default async function PeersPage({ params }: Props) {
 
   const initialPeersResult = await loadHonchoPageData<
     PaginatedResult<DashboardPeer>
-  >(() =>
-    listPeersPaginated(workspaceId, {
-      page: 1,
-      size: 10,
-    }),
-  );
+  >(() => listPeersPaginated(workspaceId));
   if (initialPeersResult.errorElement) {
     return initialPeersResult.errorElement;
   }

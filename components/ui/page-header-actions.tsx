@@ -2,7 +2,6 @@
 
 import { TableRefreshButton } from "@/components/ui/table-controls";
 import { TypedConfirmationDialog } from "@/components/ui/typed-confirmation-dialog";
-import { dispatchPageRefreshSignal } from "@/hooks/use-page-refresh-signal";
 import { getApiErrorMessage } from "@/lib/api-client";
 import { cn } from "@/lib/cn";
 import { useRouter } from "next/navigation";
@@ -41,17 +40,10 @@ export function PageHeaderActions({
     }
 
     setIsRefreshing(true);
-    const refreshPromise = dispatchPageRefreshSignal();
-
     startRefresh(() => {
       router.refresh();
     });
-
-    try {
-      await refreshPromise;
-    } finally {
-      setIsRefreshing(false);
-    }
+    setIsRefreshing(false);
   };
 
   const onOpenDeleteDialog = () => {
