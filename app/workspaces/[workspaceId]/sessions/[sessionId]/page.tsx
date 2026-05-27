@@ -114,6 +114,7 @@ export default async function SessionDetailPage({ params }: Props) {
         <div className="space-y-6 lg:col-span-1">
           <SessionPeersSection
             workspaceId={workspaceId}
+            sessionId={sessionId}
             initialPeers={initialPeers}
           />
           <JsonPanel title="Metadata" value={session.metadata} />

@@ -11,7 +11,7 @@ export const sizeQueryField = z.coerce
   .int()
   .min(1)
   .max(100)
-  .default(10);
+  .default(5);
 
 export const reverseQueryField = z.stringbool().default(false);
 

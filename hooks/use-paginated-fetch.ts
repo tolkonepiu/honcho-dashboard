@@ -1,3 +1,4 @@
+import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
 import { getApiErrorMessage } from "@/lib/api-client";
 import {
   type Dispatch,
@@ -104,6 +105,8 @@ export function usePaginatedFetch<TData>({
   const refresh = useCallback(() => {
     return runFetch();
   }, [runFetch]);
+
+  usePageRefreshSignal(refresh);
 
   return {
     isPending,
