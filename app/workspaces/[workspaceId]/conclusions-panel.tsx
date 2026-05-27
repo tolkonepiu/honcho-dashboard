@@ -12,24 +12,11 @@ import { useClipboard } from "@/hooks/use-clipboard";
 import { usePaginatedFetch } from "@/hooks/use-paginated-fetch";
 import { usePagination } from "@/hooks/use-pagination";
 import { getApiErrorMessage } from "@/lib/api-client";
+import type {
+  DashboardConclusion,
+  PaginatedResult,
+} from "@/lib/dashboard-types";
 import { useCallback, useState } from "react";
-
-type ConclusionItem = {
-  id: string;
-  content: string;
-  observerId: string;
-  observedId: string;
-  sessionId: string | null;
-  createdAt: string;
-};
-
-type ConclusionsData = {
-  items: ConclusionItem[];
-  page: number;
-  pages: number;
-  size: number;
-  total: number;
-};
 
 type ConclusionsQuery = {
   page: number;
@@ -44,20 +31,18 @@ type ConclusionsPanelProps = {
   peerIds: string[];
   sessionIds: string[];
   initialQuery: ConclusionsQuery;
-  initialConclusions: ConclusionsData;
+  initialConclusions: PaginatedResult<DashboardConclusion>;
 };
 
 function buildConclusionsApiUrl(
   workspaceId: string,
   query: ConclusionsQuery,
   size: number,
-  refreshNonce = 0,
 ) {
   const params = new URLSearchParams();
   params.set("page", String(query.page));
   params.set("size", String(size));
   params.set("reverse", String(query.reverse));
-  if (refreshNonce > 0) params.set("refresh", String(refreshNonce));
 
   if (query.observerId) params.set("observer_id", query.observerId);
   if (query.observedId) params.set("observed_id", query.observedId);
@@ -70,7 +55,7 @@ const deleteConclusionButtonClass =
   "ml-auto inline-flex h-6 w-6 items-center justify-center text-[color:color-mix(in_srgb,var(--color-danger)_60%,transparent)] transition-colors hover:text-[var(--color-danger)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-danger)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--surface-elevated)] disabled:cursor-not-allowed disabled:text-[var(--text-dim)]";
 
 type ConclusionListItemProps = {
-  conclusion: ConclusionItem;
+  conclusion: DashboardConclusion;
   copiedId: string | null;
   isDeleting: boolean;
   onCopyId: (id: string) => void;
@@ -187,19 +172,17 @@ export function ConclusionsPanel({
   initialConclusions,
 }: ConclusionsPanelProps) {
   const [query, setQuery] = useState<ConclusionsQuery>(initialQuery);
-  const [conclusions, setConclusions] =
-    useState<ConclusionsData>(initialConclusions);
+  const [conclusions, setConclusions] = useState(initialConclusions);
   const [actionError, setActionError] = useState<string | null>(null);
   const [deletingConclusionId, setDeletingConclusionId] = useState<
     string | null
   >(null);
   const { copiedId, copyToClipboard } = useClipboard();
   const pagination = usePagination(setQuery, conclusions.pages);
-  const pageSize = conclusions.size || 10;
+  const pageSize = conclusions.size;
 
   const buildUrl = useCallback(
-    (refreshNonce: number) =>
-      buildConclusionsApiUrl(workspaceId, query, pageSize, refreshNonce),
+    () => buildConclusionsApiUrl(workspaceId, query, pageSize),
     [pageSize, query, workspaceId],
   );
 
@@ -207,7 +190,7 @@ export function ConclusionsPanel({
     isPending,
     error,
     refresh: refreshConclusions,
-  } = usePaginatedFetch<ConclusionsData>({
+  } = usePaginatedFetch<typeof initialConclusions>({
     entityName: "conclusions",
     buildUrl,
     setData: setConclusions,

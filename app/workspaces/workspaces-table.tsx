@@ -5,32 +5,19 @@ import { JsonCell } from "@/components/ui/json-cell";
 import { PaginatedTableShell } from "@/components/ui/paginated-table-shell";
 import { RelativeTime } from "@/components/ui/relative-time";
 import { usePaginatedTable } from "@/hooks/use-paginated-table";
+import type {
+  DashboardWorkspaceTableRow,
+  PaginatedResult,
+} from "@/lib/dashboard-types";
 import Link from "next/link";
 
-type WorkspaceRow = {
-  id: string;
-  createdAt: string;
-  metadata: Record<string, unknown>;
-  configuration: Record<string, unknown>;
-  peerCount: number;
-  sessionCount: number;
-};
-
-type PaginatedWorkspaceData = {
-  items: WorkspaceRow[];
-  page: number;
-  pages: number;
-  size: number;
-  total: number;
-};
-
 type WorkspacesTableProps = {
-  initialWorkspaces: PaginatedWorkspaceData;
+  initialWorkspaces: PaginatedResult<DashboardWorkspaceTableRow>;
 };
 
 export function WorkspacesTable({ initialWorkspaces }: WorkspacesTableProps) {
   const { data, query, pageSize, pagination, isPending, error, refresh } =
-    usePaginatedTable<WorkspaceRow, PaginatedWorkspaceData>({
+    usePaginatedTable<DashboardWorkspaceTableRow, typeof initialWorkspaces>({
       initialData: initialWorkspaces,
       apiPath: "/api/workspaces",
       entityName: "workspaces",

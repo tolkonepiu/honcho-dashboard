@@ -4,13 +4,8 @@ import { JsonPanel } from "@/components/ui/json-panel";
 import { PageHeaderActions } from "@/components/ui/page-header-actions";
 import { RelativeTime } from "@/components/ui/relative-time";
 import { StatCard } from "@/components/ui/stat-card";
-import {
-  type DashboardSession,
-  getPeer,
-  getPeerCard,
-  listPeerSessionsPaginated,
-  type PaginatedResult,
-} from "@/lib/honcho";
+import type { DashboardSession, PaginatedResult } from "@/lib/dashboard-types";
+import { getPeer, getPeerCard, listPeerSessionsPaginated } from "@/lib/honcho";
 import { loadHonchoPageData, loadHonchoPageEntity } from "@/lib/page-data";
 import type { Metadata } from "next";
 
@@ -38,7 +33,7 @@ export default async function PeerDetailPage({ params }: Props) {
   }>(async () => {
     const [peerCard, peerSessions] = await Promise.all([
       getPeerCard(workspaceId, peerId),
-      listPeerSessionsPaginated(workspaceId, peerId, { page: 1, size: 10 }),
+      listPeerSessionsPaginated(workspaceId, peerId),
     ]);
 
     return { peerCard, peerSessions };

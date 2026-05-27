@@ -1,30 +1,18 @@
-import { nonEmptyStringField } from "@/lib/api-schemas";
+import {
+  peerCardRequestBodySchema,
+  type PeerRouteContext,
+  peerRouteParamsSchema,
+} from "@/lib/api-schemas";
 import { parseApiInput, parseApiJsonBody, routeHandler } from "@/lib/api-utils";
 import { getPeerCard, setPeerCard } from "@/lib/honcho";
-import { z } from "zod";
 
 export const dynamic = "force-dynamic";
 
-const peerCardRouteParamsSchema = z.object({
-  workspaceId: nonEmptyStringField,
-  peerId: nonEmptyStringField,
-});
-
-const peerCardRequestBodySchema = z
-  .object({
-    peer_card: z.array(nonEmptyStringField).nullable(),
-  })
-  .strict();
-
-type RouteContext = {
-  params: Promise<{ workspaceId: string; peerId: string }>;
-};
-
 export const GET = routeHandler(
-  async (_request: Request, { params }: RouteContext) => {
+  async (_request: Request, { params }: PeerRouteContext) => {
     const { workspaceId, peerId } = parseApiInput(
       await params,
-      peerCardRouteParamsSchema,
+      peerRouteParamsSchema,
       "Route parameters are invalid.",
       "invalid_route_params",
     );
@@ -35,10 +23,10 @@ export const GET = routeHandler(
 );
 
 export const PUT = routeHandler(
-  async (request: Request, { params }: RouteContext) => {
+  async (request: Request, { params }: PeerRouteContext) => {
     const { workspaceId, peerId } = parseApiInput(
       await params,
-      peerCardRouteParamsSchema,
+      peerRouteParamsSchema,
       "Route parameters are invalid.",
       "invalid_route_params",
     );

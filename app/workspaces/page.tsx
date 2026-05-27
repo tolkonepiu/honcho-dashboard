@@ -1,9 +1,9 @@
 import { WorkspacesTable } from "./workspaces-table";
-import {
-  type DashboardWorkspaceTableRow,
-  type PaginatedResult,
-  listWorkspaceTableRowsPaginated,
-} from "@/lib/honcho";
+import type {
+  DashboardWorkspaceTableRow,
+  PaginatedResult,
+} from "@/lib/dashboard-types";
+import { listWorkspaceTableRowsPaginated } from "@/lib/honcho";
 import { loadHonchoPageData } from "@/lib/page-data";
 import type { Metadata } from "next";
 
@@ -12,12 +12,7 @@ export const metadata: Metadata = { title: "Workspaces" };
 export default async function WorkspacesPage() {
   const initialWorkspacesResult = await loadHonchoPageData<
     PaginatedResult<DashboardWorkspaceTableRow>
-  >(() =>
-    listWorkspaceTableRowsPaginated({
-      page: 1,
-      size: 10,
-    }),
-  );
+  >(() => listWorkspaceTableRowsPaginated());
 
   if (initialWorkspacesResult.errorElement) {
     return initialWorkspacesResult.errorElement;

@@ -1,5 +1,5 @@
 import {
-  paginationQuerySchema,
+  listQuerySchema,
   type WorkspaceRouteContext,
   workspaceRouteParamsSchema,
 } from "@/lib/api-schemas";
@@ -16,8 +16,12 @@ export const GET = routeHandler(
       "Route parameters are invalid.",
       "invalid_route_params",
     );
-    const { page, size } = parseApiQuery(request, paginationQuerySchema);
-    const peers = await listPeersPaginated(workspaceId, { page, size });
+    const { page, reverse, size } = parseApiQuery(request, listQuerySchema);
+    const peers = await listPeersPaginated(workspaceId, {
+      page,
+      reverse,
+      size,
+    });
 
     return Response.json(peers);
   },

@@ -11,7 +11,7 @@ import {
 
 type UsePaginatedFetchOptions<TData> = {
   entityName: string;
-  buildUrl: (refreshNonce: number) => string;
+  buildUrl: () => string;
   setData: Dispatch<SetStateAction<TData>>;
 };
 
@@ -31,78 +31,62 @@ export function usePaginatedFetch<TData>({
   const isFirstRenderRef = useRef(true);
   const requestIdRef = useRef(0);
   const abortControllerRef = useRef<AbortController | null>(null);
-  const pendingPromiseRef = useRef<Promise<void> | null>(null);
 
-  const runFetch = useCallback(
-    (refreshNonce: number) => {
-      if (pendingPromiseRef.current) {
-        return pendingPromiseRef.current;
+  const runFetch = useCallback(async () => {
+    const currentRequestId = requestIdRef.current + 1;
+    requestIdRef.current = currentRequestId;
+    abortControllerRef.current?.abort();
+
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+
+    setIsPending(true);
+
+    try {
+      const response = await fetch(buildUrl(), {
+        cache: "no-store",
+        signal: abortController.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          await getApiErrorMessage(
+            response,
+            `Failed to load ${entityName} (${response.status}).`,
+          ),
+        );
       }
 
-      const currentRequestId = requestIdRef.current + 1;
-      requestIdRef.current = currentRequestId;
-      const abortController = new AbortController();
-      abortControllerRef.current = abortController;
+      const data = (await response.json()) as TData;
+      if (requestIdRef.current !== currentRequestId) {
+        return;
+      }
 
-      const pendingPromise = (async () => {
-        setIsPending(true);
+      setData(data);
+      setError(null);
+    } catch (fetchError) {
+      if (
+        abortController.signal.aborted ||
+        requestIdRef.current !== currentRequestId
+      ) {
+        return;
+      }
 
-        try {
-          const response = await fetch(buildUrl(refreshNonce), {
-            cache: "no-store",
-            signal: abortController.signal,
-          });
+      const message =
+        fetchError instanceof Error
+          ? fetchError.message
+          : `Failed to load ${entityName}.`;
+      setError(message);
+    } finally {
+      if (requestIdRef.current === currentRequestId) {
+        setIsPending(false);
+      }
 
-          if (!response.ok) {
-            throw new Error(
-              await getApiErrorMessage(
-                response,
-                `Failed to load ${entityName} (${response.status}).`,
-              ),
-            );
-          }
-
-          const data = (await response.json()) as TData;
-          if (requestIdRef.current !== currentRequestId) {
-            return;
-          }
-
-          setData(data);
-          setError(null);
-        } catch (fetchError) {
-          if (
-            abortController.signal.aborted ||
-            requestIdRef.current !== currentRequestId
-          ) {
-            return;
-          }
-
-          const message =
-            fetchError instanceof Error
-              ? fetchError.message
-              : `Failed to load ${entityName}.`;
-          setError(message);
-        } finally {
-          if (requestIdRef.current === currentRequestId) {
-            setIsPending(false);
-          }
-
-          if (abortControllerRef.current === abortController) {
-            abortControllerRef.current = null;
-          }
-
-          if (requestIdRef.current === currentRequestId) {
-            pendingPromiseRef.current = null;
-          }
-        }
-      })();
-
-      pendingPromiseRef.current = pendingPromise;
-
-      return pendingPromise;
-    },
-    [buildUrl, entityName, setData],
-  );
+      if (abortControllerRef.current === abortController) {
+        abortControllerRef.current = null;
+      }
+    }
+  }, [buildUrl, entityName, setData]);
 
   useEffect(() => {
     if (isFirstRenderRef.current) {
@@ -110,17 +94,16 @@ export function usePaginatedFetch<TData>({
       return;
     }
 
-    void runFetch(0);
+    void runFetch();
 
     return () => {
       abortControllerRef.current?.abort();
       abortControllerRef.current = null;
-      pendingPromiseRef.current = null;
     };
   }, [runFetch]);
 
   const refresh = useCallback(() => {
-    return runFetch(Date.now());
+    return runFetch();
   }, [runFetch]);
 
   usePageRefreshSignal(refresh);

@@ -11,29 +11,14 @@ import { useClipboard } from "@/hooks/use-clipboard";
 import { usePaginatedFetch } from "@/hooks/use-paginated-fetch";
 import { usePagination } from "@/hooks/use-pagination";
 import { cn } from "@/lib/cn";
+import type { DashboardMessage, PaginatedResult } from "@/lib/dashboard-types";
 import { useCallback, useMemo, useState } from "react";
-
-type MessageItem = {
-  id: string;
-  content: string;
-  peerId: string;
-  createdAt: string;
-  tokenCount: number;
-};
-
-type PaginatedMessagesData = {
-  items: MessageItem[];
-  page: number;
-  pages: number;
-  size: number;
-  total: number;
-};
 
 type MessagesSectionProps = {
   workspaceId: string;
   sessionId: string;
   peerIds: string[];
-  initialMessages: PaginatedMessagesData;
+  initialMessages: PaginatedResult<DashboardMessage>;
 };
 
 type MessagesQuery = {
@@ -51,7 +36,7 @@ function ensureCurrentOption(options: string[], currentValue?: string) {
 }
 
 function buildPeerDirectionMap(
-  messages: MessageItem[],
+  messages: DashboardMessage[],
   peerIds: string[],
   selectedPeerId?: string,
 ) {
@@ -80,7 +65,7 @@ function buildPeerDirectionMap(
 }
 
 type MessageListItemProps = {
-  message: MessageItem;
+  message: DashboardMessage;
   isRight: boolean;
   copiedId: string | null;
   onCopyId: (id: string) => void;
@@ -172,7 +157,7 @@ export function MessagesSection({
   const [messages, setMessages] = useState(initialMessages);
   const [actionError, setActionError] = useState<string | null>(null);
   const { copiedId, copyToClipboard } = useClipboard();
-  const pageSize = initialMessages.size || 10;
+  const pageSize = initialMessages.size;
   const pagination = usePagination(setQuery, messages.pages);
 
   const peerDirectionMap = useMemo(() => {
@@ -185,30 +170,24 @@ export function MessagesSection({
     [peerIds, query.peerId],
   );
 
-  const buildMessagesUrl = useCallback(
-    (refreshNonce: number) => {
-      const params = new URLSearchParams();
-      params.set("page", String(query.page));
-      params.set("size", String(pageSize));
-      params.set("reverse", String(query.reverse));
-      if (refreshNonce > 0) {
-        params.set("refresh", String(refreshNonce));
-      }
+  const buildMessagesUrl = useCallback(() => {
+    const params = new URLSearchParams();
+    params.set("page", String(query.page));
+    params.set("size", String(pageSize));
+    params.set("reverse", String(query.reverse));
 
-      if (query.peerId) {
-        params.set("filters", JSON.stringify({ peer_id: query.peerId }));
-      }
+    if (query.peerId) {
+      params.set("filters", JSON.stringify({ peer_id: query.peerId }));
+    }
 
-      return `/api/workspaces/${encodeURIComponent(workspaceId)}/sessions/${encodeURIComponent(sessionId)}/messages?${params.toString()}`;
-    },
-    [pageSize, query, sessionId, workspaceId],
-  );
+    return `/api/workspaces/${encodeURIComponent(workspaceId)}/sessions/${encodeURIComponent(sessionId)}/messages?${params.toString()}`;
+  }, [pageSize, query, sessionId, workspaceId]);
 
   const {
     isPending,
     error,
     refresh: refreshMessages,
-  } = usePaginatedFetch<PaginatedMessagesData>({
+  } = usePaginatedFetch<typeof initialMessages>({
     entityName: "messages",
     buildUrl: buildMessagesUrl,
     setData: setMessages,

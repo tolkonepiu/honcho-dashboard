@@ -6,27 +6,12 @@ import { JsonCell } from "@/components/ui/json-cell";
 import { PaginatedTableShell } from "@/components/ui/paginated-table-shell";
 import { RelativeTime } from "@/components/ui/relative-time";
 import { usePaginatedTable } from "@/hooks/use-paginated-table";
+import type { DashboardSession, PaginatedResult } from "@/lib/dashboard-types";
 import Link from "next/link";
-
-type SessionRow = {
-  id: string;
-  isActive: boolean;
-  createdAt: string;
-  metadata: Record<string, unknown>;
-  configuration: Record<string, unknown>;
-};
-
-type PaginatedSessionsData = {
-  items: SessionRow[];
-  page: number;
-  pages: number;
-  size: number;
-  total: number;
-};
 
 type SessionsSectionProps = {
   workspaceId: string;
-  initialSessions: PaginatedSessionsData;
+  initialSessions: PaginatedResult<DashboardSession>;
   sessionsApiPath?: string;
   sessionsBasePath?: string;
   title?: string;
@@ -58,7 +43,7 @@ export function SessionsSection({
   const resolvedEmptyStateDescription =
     emptyStateDescription ?? "This workspace has no sessions yet.";
   const { data, query, pageSize, pagination, isPending, error, refresh } =
-    usePaginatedTable<SessionRow, PaginatedSessionsData>({
+    usePaginatedTable<DashboardSession, typeof initialSessions>({
       initialData: initialSessions,
       apiPath: resolvedSessionsApiPath,
       entityName: "sessions",

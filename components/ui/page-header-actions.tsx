@@ -28,19 +28,21 @@ export function PageHeaderActions({
   deleteAction,
 }: PageHeaderActionsProps) {
   const router = useRouter();
-  const [, startRefresh] = useTransition();
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isRouterRefreshing, startRefresh] = useTransition();
+  const [isPageRefreshing, setIsPageRefreshing] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [confirmValue, setConfirmValue] = useState("");
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const isRefreshing = isPageRefreshing || isRouterRefreshing;
 
   const onRefresh = async () => {
     if (isRefreshing) {
       return;
     }
 
-    setIsRefreshing(true);
+    setIsPageRefreshing(true);
     const refreshPromise = dispatchPageRefreshSignal();
 
     startRefresh(() => {
@@ -50,7 +52,7 @@ export function PageHeaderActions({
     try {
       await refreshPromise;
     } finally {
-      setIsRefreshing(false);
+      setIsPageRefreshing(false);
     }
   };
 

@@ -4,25 +4,21 @@ import { ClickableTableRow } from "@/components/ui/clickable-table-row";
 import { EmptyState } from "@/components/ui/empty-state";
 import { RelativeTime } from "@/components/ui/relative-time";
 import { Surface } from "@/components/ui/surface";
-import { TablePager, TableRefreshButton } from "@/components/ui/table-controls";
+import { TableRefreshButton } from "@/components/ui/table-controls";
 import { usePageRefreshSignal } from "@/hooks/use-page-refresh-signal";
 import { getApiErrorMessage } from "@/lib/api-client";
+import type { DashboardPeer } from "@/lib/dashboard-types";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
-
-type SessionPeer = {
-  id: string;
-  createdAt: string;
-};
 
 type SessionPeersSectionProps = {
   workspaceId: string;
   sessionId: string;
-  initialPeers: SessionPeer[];
+  initialPeers: DashboardPeer[];
 };
 
 type SessionPeersResponse = {
-  items: SessionPeer[];
+  items: DashboardPeer[];
 };
 
 export function SessionPeersSection({
@@ -30,32 +26,26 @@ export function SessionPeersSection({
   sessionId,
   initialPeers,
 }: SessionPeersSectionProps) {
-  const [peers, setPeers] = useState(initialPeers);
-  const [page, setPage] = useState(1);
-  const [isPending, setIsPending] = useState(false);
+  const [items, setItems] = useState(initialPeers);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const pageSize = 10;
-
-  const pages = Math.max(1, Math.ceil(peers.length / pageSize));
-  const visiblePeers = useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return peers.slice(start, start + pageSize);
-  }, [page, peers]);
+  const peers = useMemo(
+    () => [...items].sort((left, right) => left.id.localeCompare(right.id)),
+    [items],
+  );
+  const peersBasePath = `/workspaces/${encodeURIComponent(workspaceId)}/peers`;
 
   const refreshPeers = useCallback(async () => {
-    if (isPending) {
+    if (isRefreshing) {
       return;
     }
 
-    setIsPending(true);
+    setIsRefreshing(true);
 
     try {
-      const refreshValue = Date.now();
       const response = await fetch(
-        `/api/workspaces/${encodeURIComponent(workspaceId)}/sessions/${encodeURIComponent(sessionId)}/peers?refresh=${refreshValue}`,
-        {
-          cache: "no-store",
-        },
+        `/api/workspaces/${encodeURIComponent(workspaceId)}/sessions/${encodeURIComponent(sessionId)}/peers`,
+        { cache: "no-store" },
       );
 
       if (!response.ok) {
@@ -68,11 +58,7 @@ export function SessionPeersSection({
       }
 
       const data = (await response.json()) as SessionPeersResponse;
-      setPeers(data.items);
-      setPage((previous) => {
-        const nextPages = Math.max(1, Math.ceil(data.items.length / pageSize));
-        return Math.min(previous, nextPages);
-      });
+      setItems(data.items);
       setError(null);
     } catch (refreshError) {
       const message =
@@ -81,13 +67,11 @@ export function SessionPeersSection({
           : "Failed to load peers.";
       setError(message);
     } finally {
-      setIsPending(false);
+      setIsRefreshing(false);
     }
-  }, [isPending, sessionId, workspaceId]);
+  }, [isRefreshing, sessionId, workspaceId]);
 
   usePageRefreshSignal(refreshPeers);
-
-  const peersBasePath = `/workspaces/${encodeURIComponent(workspaceId)}/peers`;
 
   return (
     <section className="space-y-3">
@@ -95,7 +79,7 @@ export function SessionPeersSection({
         <h2 className="ui-section-label">Peers ({peers.length})</h2>
 
         <TableRefreshButton
-          isPending={isPending}
+          isPending={isRefreshing}
           onRefresh={() => {
             void refreshPeers();
           }}
@@ -124,7 +108,7 @@ export function SessionPeersSection({
               </thead>
 
               <tbody className="divide-y divide-[var(--surface-border-muted)]">
-                {visiblePeers.map((peer) => {
+                {peers.map((peer) => {
                   const href = `${peersBasePath}/${encodeURIComponent(peer.id)}`;
 
                   return (
@@ -150,18 +134,6 @@ export function SessionPeersSection({
               </tbody>
             </table>
           </div>
-
-          <TablePager
-            page={page}
-            pages={pages}
-            size={pageSize}
-            total={peers.length}
-            isPending={isPending}
-            onFirst={() => setPage(1)}
-            onPrevious={() => setPage((previous) => Math.max(1, previous - 1))}
-            onNext={() => setPage((previous) => Math.min(pages, previous + 1))}
-            onLast={() => setPage(pages)}
-          />
         </Surface>
       )}
 

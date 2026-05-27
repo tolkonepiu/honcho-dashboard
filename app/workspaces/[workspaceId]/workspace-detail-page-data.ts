@@ -2,6 +2,10 @@ import {
   type DashboardConclusion,
   type DashboardPeer,
   type DashboardSession,
+  type PaginatedResult,
+  type WorkspaceStats,
+} from "@/lib/dashboard-types";
+import {
   getWorkspace,
   getWorkspaceStats,
   listConclusions,
@@ -9,8 +13,6 @@ import {
   listPeersPaginated,
   listSessions,
   listSessionsPaginated,
-  type PaginatedResult,
-  type WorkspaceStats,
 } from "@/lib/honcho";
 import { loadHonchoPageData, loadHonchoPageEntity } from "@/lib/page-data";
 import { z } from "zod";
@@ -104,11 +106,10 @@ export async function loadWorkspaceDetailPageData(
         getWorkspaceStats(workspaceId),
         listPeers(workspaceId),
         listSessions(workspaceId),
-        listPeersPaginated(workspaceId, { page: 1, size: 10 }),
-        listSessionsPaginated(workspaceId, { page: 1, size: 10 }),
+        listPeersPaginated(workspaceId),
+        listSessionsPaginated(workspaceId),
         listConclusions(workspaceId, {
           page: initialQuery.page,
-          size: 10,
           reverse: initialQuery.reverse,
           filters,
         }),
