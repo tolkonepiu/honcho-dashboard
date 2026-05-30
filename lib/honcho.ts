@@ -288,12 +288,10 @@ export async function getPeer(
   workspaceId: string,
   peerId: string,
 ): Promise<DashboardPeer | null> {
-  if (!(await getWorkspace(workspaceId))) {
-    return null;
-  }
+  const client = createClient(workspaceId);
+  const peer = await runHonchoRequest(() => client.peer(peerId));
 
-  const peers = await listPeers(workspaceId);
-  return peers.find((peer) => peer.id === peerId) ?? null;
+  return peer ? serializePeer(peer) : null;
 }
 
 export async function listSessions(
@@ -370,24 +368,10 @@ export async function getSession(
   workspaceId: string,
   sessionId: string,
 ): Promise<DashboardSession | null> {
-  if (!(await getWorkspace(workspaceId))) {
-    return null;
-  }
-
-  const sessions = await listSessions(workspaceId);
-  return sessions.find((session) => session.id === sessionId) ?? null;
-}
-
-export async function listMessages(
-  workspaceId: string,
-  sessionId: string,
-): Promise<DashboardMessage[]> {
   const client = createClient(workspaceId);
   const session = await runHonchoRequest(() => client.session(sessionId));
-  const messages = await runHonchoRequest(() => session.messages());
-  const items = await runHonchoRequest(() => messages.toArray());
 
-  return items.map(serializeMessage);
+  return session ? serializeSession(session) : null;
 }
 
 export type MessageFilters = Record<string, unknown>;
