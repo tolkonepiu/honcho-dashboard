@@ -29,7 +29,7 @@ export async function loadHonchoPageData<T>(
 }
 
 export async function loadHonchoPageEntity<T>(
-  loader: () => Promise<T | null>,
+  loader: () => Promise<T | null | undefined>,
 ): Promise<PageDataResult<T>> {
   const result = await loadHonchoPageData(loader);
 
@@ -37,7 +37,7 @@ export async function loadHonchoPageEntity<T>(
     return result;
   }
 
-  if (result.data === null) {
+  if (result.data == null) {
     notFound();
   }
 

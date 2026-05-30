@@ -36,7 +36,7 @@ export const countProbePaginationSchema = paginationQuerySchema.extend({
 
 export const filtersSchema = z.record(z.string(), z.unknown());
 
-export const messageListOptionsSchema = listOptionsSchema.extend({
+export const filteredListOptionsSchema = listOptionsSchema.extend({
   filters: filtersSchema.optional(),
 });
 
@@ -51,6 +51,7 @@ export const conclusionListOptionsSchema = listOptionsSchema.extend({
 });
 
 export type ListOptions = z.input<typeof listOptionsSchema>;
+export type FilteredListOptions = z.input<typeof filteredListOptionsSchema>;
 
 export const workspaceRouteParamsSchema = z.object({
   workspaceId: nonEmptyStringField,

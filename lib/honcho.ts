@@ -1,10 +1,10 @@
 import {
   conclusionListOptionsSchema,
   countProbePaginationSchema,
+  type FilteredListOptions,
   type ListOptions,
+  filteredListOptionsSchema,
   listOptionsSchema,
-  messageListOptionsSchema,
-  paginationQuerySchema,
 } from "@/lib/api-schemas";
 import type {
   ConclusionFilters,
@@ -171,31 +171,6 @@ function serializeConclusionResponse(
   };
 }
 
-async function fetchAllPages<T>(
-  fetchPage: (page: number, size: number) => Promise<PageResponse<T>>,
-): Promise<T[]> {
-  const items: T[] = [];
-  const pagination = paginationQuerySchema.parse({});
-  let pageNumber = pagination.page;
-  let totalPages = 1;
-
-  while (pageNumber <= totalPages) {
-    const response = await runHonchoRequest(() =>
-      fetchPage(pageNumber, pagination.size),
-    );
-    items.push(...response.items);
-
-    totalPages = response.pages;
-    if (totalPages === 0) {
-      break;
-    }
-
-    pageNumber += 1;
-  }
-
-  return items;
-}
-
 function buildPaginatedResult<TRaw, TMapped>(
   response: PageResponse<TRaw>,
   mapper: (item: TRaw) => TMapped,
@@ -209,25 +184,16 @@ function buildPaginatedResult<TRaw, TMapped>(
   };
 }
 
-export async function listWorkspaces(): Promise<DashboardWorkspace[]> {
-  const client = createClient();
-  const items = await fetchAllPages<WorkspaceResponse>((page, size) =>
-    pagePost<WorkspaceResponse>(client, `${API_PREFIX}/workspaces/list`, {
-      query: { page, size },
-    }),
-  );
-
-  return items.map(mapWorkspace);
-}
-
 export async function listWorkspacesPaginated(
-  options: ListOptions = {},
+  options: FilteredListOptions = {},
 ): Promise<PaginatedResult<DashboardWorkspace>> {
-  const { page, reverse, size } = listOptionsSchema.parse(options);
+  const { filters, page, reverse, size } =
+    filteredListOptionsSchema.parse(options);
   const client = createClient();
   const response = await runHonchoRequest(() =>
     pagePost<WorkspaceResponse>(client, `${API_PREFIX}/workspaces/list`, {
-      query: { page, reverse: reverse ? "true" : undefined, size },
+      body: filters ? { filters } : {},
+      query: { page, reverse, size },
     }),
   );
 
@@ -258,9 +224,12 @@ export async function listWorkspaceTableRowsPaginated(
 
 export async function getWorkspace(
   workspaceId: string,
-): Promise<DashboardWorkspace | null> {
-  const workspaces = await listWorkspaces();
-  return workspaces.find((workspace) => workspace.id === workspaceId) ?? null;
+): Promise<DashboardWorkspace | undefined> {
+  const workspaces = await listWorkspacesPaginated({
+    filters: { id: workspaceId },
+    size: 1,
+  });
+  return workspaces.items.find(({ id }) => id === workspaceId);
 }
 
 export async function listPeers(workspaceId: string): Promise<DashboardPeer[]> {
@@ -387,7 +356,7 @@ export async function listMessagesPaginated(
   } = {},
 ): Promise<PaginatedResult<DashboardMessage>> {
   const { filters, page, size, reverse } =
-    messageListOptionsSchema.parse(options);
+    filteredListOptionsSchema.parse(options);
 
   const client = createClient(workspaceId);
   const session = await runHonchoRequest(() => client.session(sessionId));
