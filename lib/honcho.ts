@@ -224,12 +224,12 @@ export async function listWorkspaceTableRowsPaginated(
 
 export async function getWorkspace(
   workspaceId: string,
-): Promise<DashboardWorkspace | undefined> {
+): Promise<DashboardWorkspace | null> {
   const workspaces = await listWorkspacesPaginated({
     filters: { id: workspaceId },
     size: 1,
   });
-  return workspaces.items.find(({ id }) => id === workspaceId);
+  return workspaces.items.find(({ id }) => id === workspaceId) ?? null;
 }
 
 export async function listPeers(workspaceId: string): Promise<DashboardPeer[]> {
