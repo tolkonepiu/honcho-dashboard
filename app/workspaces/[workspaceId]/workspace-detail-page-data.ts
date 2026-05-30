@@ -36,9 +36,7 @@ type WorkspaceConclusionQuery = {
 };
 
 type WorkspaceDetailPageData = {
-  workspace: Awaited<ReturnType<typeof getWorkspace>> extends infer T | null
-    ? T
-    : never;
+  workspace: NonNullable<Awaited<ReturnType<typeof getWorkspace>>>;
   stats: WorkspaceStats;
   peers: DashboardPeer[];
   sessions: DashboardSession[];
