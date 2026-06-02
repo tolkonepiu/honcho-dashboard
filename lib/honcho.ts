@@ -362,10 +362,10 @@ export async function listMessagesPaginated(
   const session = await runHonchoRequest(() => client.session(sessionId));
   const response = await runHonchoRequest(() =>
     session.messages({
+      filters,
       page,
       size,
       reverse,
-      ...(filters && Object.keys(filters).length > 0 ? { filters } : {}),
     }),
   );
 
@@ -394,10 +394,6 @@ export async function listConclusions(
 ): Promise<PaginatedResult<DashboardConclusion>> {
   const { filters, page, size, reverse } =
     conclusionListOptionsSchema.parse(options);
-  const bodyFilters: Record<string, unknown> = {};
-  if (filters?.observer_id) bodyFilters.observer_id = filters.observer_id;
-  if (filters?.observed_id) bodyFilters.observed_id = filters.observed_id;
-  if (filters?.session_id) bodyFilters.session_id = filters.session_id;
 
   const client = createClient(workspaceId);
   const response = await runHonchoRequest(() =>
@@ -405,11 +401,8 @@ export async function listConclusions(
       client,
       `${conclusionsPath(workspaceId)}/list`,
       {
-        body: {
-          filters:
-            Object.keys(bodyFilters).length > 0 ? bodyFilters : undefined,
-        },
-        query: { page, size, reverse: reverse ? "true" : undefined },
+        body: filters ? { filters } : {},
+        query: { page, size, reverse },
       },
     ),
   );
