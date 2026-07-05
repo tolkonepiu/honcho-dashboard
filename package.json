@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@catppuccin/tailwindcss": "1.0.0",
-    "@eslint-react/eslint-plugin": "5.10.0",
+    "@eslint-react/eslint-plugin": "5.10.1",
     "@next/eslint-plugin-next": "16.2.10",
     "@tailwindcss/postcss": "4.3.2",
     "@trivago/prettier-plugin-sort-imports": "6.0.2",
