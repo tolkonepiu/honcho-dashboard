@@ -5,8 +5,7 @@ import type { ReactElement } from "react";
 import "server-only";
 
 type PageDataResult<T> =
-  | { data: T; errorElement: null }
-  | { data: null; errorElement: ReactElement };
+  { data: T; errorElement: null } | { data: null; errorElement: ReactElement };
 
 export async function loadHonchoPageData<T>(
   loader: () => Promise<T>,
