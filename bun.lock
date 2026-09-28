@@ -6,7 +6,7 @@
       "name": "honcho-dashboard",
       "dependencies": {
         "@hackernoon/pixel-icon-library": "1.1.0",
-        "@honcho-ai/sdk": "2.5.0",
+        "@honcho-ai/sdk": "2.5.1",
         "clsx": "2.1.1",
         "date-fns": "4.4.0",
         "next": "16.3.6",
@@ -112,7 +112,7 @@
 
     "@hackernoon/pixel-icon-library": ["@hackernoon/pixel-icon-library@1.1.0", "", {}, "sha512-VEdDskTYRc37quKh3LFt65nMtriJlxuov/ifOmlomAyfK2hty4IPdL6IIXNvATOaQwZYjlfyxJTCGO+JgWbgIw=="],
 
-    "@honcho-ai/sdk": ["@honcho-ai/sdk@2.5.0", "", { "dependencies": { "zod": "4.0.0" } }, "sha512-lek94SGOtlJNXXEfBWgLkANooMXOHkdsYUcQEwxVwZQcXP0GTpuE0DvKLgRFe10St/s7PcbMP23UOF9ABekuIg=="],
+    "@honcho-ai/sdk": ["@honcho-ai/sdk@2.5.1", "", { "dependencies": { "zod": "4.0.0" } }, "sha512-CYUy22D4+wnrLMLcuHfhLVhSOvuvv8wBievDfbMkT4B+PMAjuDlPVGdP+3/aWaKd2J+M6ufFD78jyavft9yZXw=="],
 
     "@humanfs/core": ["@humanfs/core@0.19.2", "", { "dependencies": { "@humanfs/types": "^0.15.0" } }, "sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA=="],
 
